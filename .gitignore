@@ -1,0 +1,7 @@
+*.ini
+*.pem
+*.key
+*.dll
+PreschoolServer/PreschoolServer_debug/*
+PreschoolServer/PreschoolServer_release/*
+*.user
