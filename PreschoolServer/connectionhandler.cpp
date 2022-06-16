@@ -6,6 +6,35 @@
 
 #define MyDebug() qDebug() << "ConnectionHandler:" << m_socket
 
+ConnectionHandler::ConnectionPtr ConnectionHandler::createConnectionHandler(QWebSocket *socket)
+{
+    return QSharedPointer<ConnectionHandler>{new ConnectionHandler(socket)};
+}
+
+void ConnectionHandler::sendMessage(const QJsonObject &obj)
+{
+    MyDebug() << Q_FUNC_INFO;
+    QJsonDocument doc{obj};
+    QString message = doc.toJson(QJsonDocument::Compact);
+
+    emit sendTextMessage(message);
+}
+
+void ConnectionHandler::setUserId(UserIdType id)
+{
+    m_userId = id;
+}
+
+void ConnectionHandler::setUserName(const QString &name)
+{
+    m_userName = name;
+}
+
+void ConnectionHandler::setUserRole(UserRole role)
+{
+    m_userRole = role;
+}
+
 ConnectionHandler::ConnectionHandler(QWebSocket* socket, QObject *parent) :
     QObject(parent),
     m_socket(socket)
@@ -13,9 +42,14 @@ ConnectionHandler::ConnectionHandler(QWebSocket* socket, QObject *parent) :
     MyDebug() << "construct";
 
     connect(m_socket, &QWebSocket::textMessageReceived,
-            this, &ConnectionHandler::onMessageReceived);
+            this, &ConnectionHandler::onMessageReceived,
+            Qt::QueuedConnection);
     connect(m_socket, &QWebSocket::disconnected,
-            this, &ConnectionHandler::onSocketDisconnected);
+            this, &ConnectionHandler::onSocketDisconnected,
+            Qt::QueuedConnection);
+    connect(this, &ConnectionHandler::sendTextMessage,
+            m_socket, &QWebSocket::sendTextMessage,
+            Qt::QueuedConnection);
 }
 
 void ConnectionHandler::onMessageReceived(const QString &message)
@@ -44,7 +78,10 @@ void ConnectionHandler::onMessageReceived(const QString &message)
     {
     case Protocol::Codes::Authorization:
     {
-
+        if(m_userId == DefaultUserId)
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
         break;
     }
     default:
@@ -57,5 +94,5 @@ void ConnectionHandler::onMessageReceived(const QString &message)
 
 void ConnectionHandler::onSocketDisconnected()
 {
-    emit connectionClosed(this->sharedFromThis());
+    emit connectionClosed(sharedFromThis());
 }

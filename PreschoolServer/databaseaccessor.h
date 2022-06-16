@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QJsonObject>
+#include "connectionhandler.h"
 
 class DatabaseAccessor: public QObject
 {
@@ -13,6 +15,8 @@ public:
 
 public slots:
     void start();
+
+    void onRequest(const QJsonObject& obj);
 
 private:
     QSqlDatabase db;

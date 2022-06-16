@@ -5,6 +5,7 @@
 
 class QWebSocketServer;
 class ConnectionHandler;
+class DatabaseAccessor;
 
 class Server: public QObject
 {
@@ -29,6 +30,7 @@ public:
 private:
     int m_port;
     QWebSocketServer* m_webSocketServer{nullptr};
+    DatabaseAccessor* m_databaseAccessor{nullptr};
     QList<ConnectionHandler::ConnectionPtr> m_connections;
 };
 

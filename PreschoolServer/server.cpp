@@ -7,6 +7,7 @@
 #include <QSharedPointer>
 #include "server.h"
 #include "connectionhandler.h"
+#include "databaseaccessor.h"
 
 #define MyDebug() qDebug() << "Server:"
 
@@ -72,6 +73,9 @@ void Server::start()
 
     m_webSocketServer->setSslConfiguration(sslConfigServer);
 
+    m_databaseAccessor = new DatabaseAccessor(this);
+    m_databaseAccessor->start();
+
     this->startListen();
 }
 
@@ -99,7 +103,7 @@ void Server::onNewConnection()
 {
     MyDebug() << Q_FUNC_INFO;
     QWebSocket* pSocket = m_webSocketServer->nextPendingConnection();
-    ConnectionHandler::ConnectionPtr connectionHandler = QSharedPointer<ConnectionHandler>::create(pSocket);
+    ConnectionHandler::ConnectionPtr connectionHandler = ConnectionHandler::createConnectionHandler(pSocket);
     connect(connectionHandler.data(), &ConnectionHandler::connectionClosed,
             this, &Server::onConnectionClosed);
     m_connections.push_back(std::move(connectionHandler));
