@@ -16,7 +16,7 @@ public:
 public slots:
     void start();
 
-    void onRequest(const QJsonObject& obj);
+    void onRequest(const QJsonObject& obj, ConnectionHandler::ConnectionPtr connectionHandler);
 
 private:
     QSqlDatabase db;

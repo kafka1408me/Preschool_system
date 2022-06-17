@@ -93,9 +93,9 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
     case Codes::Authorization:
     {
         QString login = mainObj.value(LOGIN).toString();
-        QString pass = mainObj.value(PASSWORD).toString();
+        QString password = mainObj.value(PASSWORD).toString();
 
-        query.prepare(QStringLiteral("SELECT id, name, role, hash, salt FROM users "
+        query.prepare(QStringLiteral("SELECT user_id, user_name, user_role, hash, salt FROM users "
                                      "WHERE user_login=:user_login"));
         query.bindValue(QStringLiteral(":login"), login);
 
@@ -104,7 +104,26 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
         query.exec();
         if(query.first())
         {
+            QByteArray hash = query.value("hash").toByteArray();
+            QString salt = query.value("salt").toString();
 
+            if(createHashPwd(password, salt) == hash)
+            {
+                UserIdType userId = query.value("user_id").value<UserIdType>();
+                QString userName = query.value("user_name").toString();
+                UserRole userRole = UserRole(query.value("user_role").toInt());
+
+                connectionHandler->setUserId(userId);
+                connectionHandler->setUserRole(userRole);
+                connectionHandler->setUserName(userName);
+
+                responseObj.insert(RESULT, RESULT_SUCCESS);
+            }
+            else
+            {
+                MyDebug() << "login failed";
+                responseObj.insert(RESULT, RESULT_FAIL);
+            }
         }
         else
         {

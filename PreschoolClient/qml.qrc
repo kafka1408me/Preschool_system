@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/main.qml</file>
+        <file>key/ca_cert.pem</file>
+        <file>qml/LoginPage.qml</file>
+        <file>images/children.jpg</file>
+        <file>qml/InputField.qml</file>
+        <file>Functions.js</file>
+        <file>qml/InputFieldWithDescription.qml</file>
+        <file>qml/MyButton.qml</file>
+    </qresource>
+</RCC>
