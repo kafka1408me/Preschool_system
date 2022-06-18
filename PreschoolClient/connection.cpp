@@ -4,8 +4,10 @@
 #include <QTimer>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QTimer>
 #include "connection.h"
 #include "Codes.h"
+#include "userinfo.h"
 
 #define MyDebug() qDebug() << "Connection:"
 
@@ -14,14 +16,31 @@ Connection::Connection(const QUrl& url, QObject *parent) :
     m_url(url)
 {
     MyDebug() << "construct";
-    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
+    connect(this, &Connection::userNameReceived, UserInfo::getInstance(), &UserInfo::setUserName);
+    connect(this, &Connection::userRoleReceived, UserInfo::getInstance(), &UserInfo::setUserRole);
 }
 
 Connection::~Connection()
 {
+    close();
+}
+
+void Connection::close()
+{
     if(m_isConnected)
     {
         m_socket->close();
+        setIsConnected(false);
+    }
+    if(m_socket)
+    {
+        m_socket->deleteLater();
+        m_socket = nullptr;
+    }
+    if(m_reconnectTimer)
+    {
+        m_reconnectTimer->deleteLater();
+        m_reconnectTimer = nullptr;
     }
 }
 
@@ -50,7 +69,7 @@ void Connection::sendMessage(const QJsonObject &obj)
 void Connection::start()
 {
     MyDebug() << Q_FUNC_INFO;
-    m_socket = new QWebSocket("PreschoolSocket", QWebSocketProtocol::VersionLatest, this);
+    m_socket = new QWebSocket("PreschoolSocket", QWebSocketProtocol::VersionLatest);
     connect(m_socket, &QWebSocket::connected, this, &Connection::onConnected);
     connect(m_socket, &QWebSocket::disconnected, this, &Connection::onDisconnected);
     connect(m_socket, &QWebSocket::textMessageReceived, this, &Connection::onTextMessageReceived);
@@ -90,14 +109,74 @@ void Connection::logIn(const QString &login, const QString &password)
     sendMessage(obj);
 }
 
-void Connection::onTextMessageReceived(const QString &message)
+void Connection::logOut()
 {
     MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::LogOut},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::onTextMessageReceived(const QString &message)
+{
+    MyDebug() << "message received" << message;
+
+    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+
+    if(doc.isNull())
+    {
+        MyDebug() << "doc is null";
+        return;
+    }
+    if(!doc.isObject())
+    {
+        MyDebug() << "doc is not object!";
+        return;
+    }
+
+    QJsonObject obj = doc.object();
+
+    int type = obj.value(Protocol::MESSAGE_TYPE).toInt();
+    int result = obj.value(Protocol::RESULT).toInt(Protocol::RESULT_FAIL);
+
+    switch (type)
+    {
+    case Protocol::Codes::Authorization:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QString userName = obj.value(Protocol::USER_NAME).toString();
+            User::UserRole userRole = User::UserRole(obj.value(Protocol::USER_ROLE).toInt());
+
+            emit userNameReceived(userName);
+            emit userRoleReceived(userRole);
+
+            emit logInSuccess();
+        }
+        else
+        {
+            emit logInFailed();
+        }
+        break;
+    }
+    default:
+    {
+        MyDebug() << "undefined message type" << type;
+        break;
+    }
+    }
 }
 
 void Connection::onConnected()
 {
     MyDebug() << Q_FUNC_INFO;
+    if(m_reconnectTimer)
+    {
+        m_reconnectTimer->stop();
+    }
     setIsConnected(true);
 }
 
@@ -106,7 +185,14 @@ void Connection::onDisconnected()
     MyDebug() << Q_FUNC_INFO;
     setIsConnected(false);
 
-    QTimer::singleShot(5000, this, &Connection::tryConnect);
+    if(!m_reconnectTimer)
+    {
+        m_reconnectTimer = new QTimer;
+        m_reconnectTimer->setInterval(5000);
+        m_reconnectTimer->setSingleShot(true);
+        connect(m_reconnectTimer, &QTimer::timeout, this, &Connection::tryConnect);
+    }
+    m_reconnectTimer->start();
 }
 
 void Connection::tryConnect()

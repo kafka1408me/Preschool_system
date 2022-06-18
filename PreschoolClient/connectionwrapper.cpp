@@ -11,10 +11,17 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
 
     connect(this, &ConnectionWrapper::startConnecting,
             m_connection.get(), &Connection::start, Qt::QueuedConnection);
-    connect(m_connection.get(), &Connection::isConnectedChanged,
-            this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryLogIn,
             m_connection.get(), &Connection::logIn, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryLogOut,
+            m_connection.get(), &Connection::logOut, Qt::QueuedConnection);
+
+    connect(m_connection.get(), &Connection::isConnectedChanged,
+            this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
+    connect(m_connection.get(), &Connection::logInSuccess,
+            this, &ConnectionWrapper::logInSuccess);
+    connect(m_connection.get(), &Connection::logInFailed,
+            this, &ConnectionWrapper::logInFailed);
 
     m_connection->moveToThread(m_connectionThread);
     m_connectionThread->start();
@@ -39,6 +46,11 @@ bool ConnectionWrapper::isConnected() const
 void ConnectionWrapper::logIn(const QString &login, const QString &password)
 {
     emit tryLogIn(login, password);
+}
+
+void ConnectionWrapper::logOut()
+{
+    emit tryLogOut();
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

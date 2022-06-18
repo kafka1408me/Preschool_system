@@ -19,6 +19,8 @@ public:
 
     Q_INVOKABLE void logIn(const QString& login, const QString& password);
 
+    Q_INVOKABLE void logOut();
+
 signals:
     void startConnecting();
 
@@ -26,11 +28,17 @@ signals:
 
     void tryLogIn(const QString& login, const QString& password);
 
+    void logInSuccess();
+
+    void logInFailed();
+
+    void tryLogOut();
+
 private slots:
     void onConnectedChanged(bool connected);
 
 private:
-    QThread* m_connectionThread;
+    QThread* m_connectionThread{nullptr};
     QScopedPointer<Connection> m_connection;
     bool m_isConnected{false};
 };

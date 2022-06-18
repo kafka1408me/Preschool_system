@@ -28,7 +28,8 @@ namespace Protocol
 
 enum Codes
 {
-    Authorization = 1
+    Authorization = 1,
+    LogOut        = 2
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -36,6 +37,8 @@ const QString LOGIN = "login";
 const QString PASSWORD = "password";
 const QString MESSAGE_DATA = "main";
 const QString RESULT = "result";
+const QString USER_NAME = "user_name";
+const QString USER_ROLE = "user_role";
 
 constexpr int RESULT_SUCCESS = 0;
 constexpr int RESULT_FAIL = 1;

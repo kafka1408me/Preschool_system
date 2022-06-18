@@ -30,7 +30,7 @@ void ConnectionHandler::setUserName(const QString &name)
     m_userName = name;
 }
 
-void ConnectionHandler::setUserRole(UserRole role)
+void ConnectionHandler::setUserRole(User::UserRole role)
 {
     m_userRole = role;
 }
@@ -82,6 +82,12 @@ void ConnectionHandler::onMessageReceived(const QString &message)
         {
             emit requestDatabase(obj, sharedFromThis());
         }
+        break;
+    }
+    case Protocol::Codes::LogOut:
+    {
+        m_userId = DefaultUserId;
+        m_userName = "";
         break;
     }
     default:

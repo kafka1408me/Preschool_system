@@ -22,7 +22,7 @@ public:
 
     void setUserName(const QString& name);
 
-    void setUserRole(UserRole role);
+    void setUserRole(User::UserRole role);
 
 private:
     explicit ConnectionHandler(QWebSocket* socket, QObject *parent = nullptr);
@@ -43,6 +43,6 @@ private:
     QWebSocket* m_socket;
     UserIdType m_userId{DefaultUserId};
     QString m_userName;
-    UserRole m_userRole{UserRole::Parent};
+    User::UserRole m_userRole{User::UserRole::Parent};
 };
 

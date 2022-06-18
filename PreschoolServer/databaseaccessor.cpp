@@ -13,6 +13,8 @@
 static constexpr char myStr[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 constexpr auto randStrSize = sizeof (myStr)/sizeof (char) - 1;
 
+constexpr int saltLength = 64;
+
 static auto randomGenerator = QRandomGenerator::system();
 
 QString createRandomStringAdditional(const int length, const char* str, const int strLength)
@@ -74,6 +76,10 @@ void DatabaseAccessor::start()
         MyDebug() << "FAILURE connection to database: " << db.lastError().text();
         exit(-100);
     }
+
+    createUser("admin", "admin", "Татьяна Алексеевна", User::UserRole::Admin);
+    createUser("parent_0", "parent", "Алиса Хромова Петровна", User::UserRole::Parent);
+    createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
 }
 
 void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::ConnectionPtr connectionHandler)
@@ -81,43 +87,45 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
     using namespace Protocol;
 
     MyDebug() << Q_FUNC_INFO << obj;
+
+    MyDebug() << Q_FUNC_INFO << obj;
     QSqlQuery query(db);
 
     const int type = obj.value(MESSAGE_TYPE).toInt();
 
-    QJsonObject mainObj = obj.value(MESSAGE_DATA).toObject();
-
-    MyDebug() << "mainObj" << mainObj;
     switch (type)
     {
     case Codes::Authorization:
     {
-        QString login = mainObj.value(LOGIN).toString();
-        QString password = mainObj.value(PASSWORD).toString();
+        QString login = obj.value(LOGIN).toString();
+        QString password = obj.value(PASSWORD).toString();
 
-        query.prepare(QStringLiteral("SELECT user_id, user_name, user_role, hash, salt FROM users "
+        query.prepare(QStringLiteral("SELECT user_id, user_name, user_role, user_pwd, salt FROM users "
                                      "WHERE user_login=:user_login"));
-        query.bindValue(QStringLiteral(":login"), login);
+        query.bindValue(QStringLiteral(":user_login"), login);
 
         QJsonObject responseObj;
+        responseObj.insert(MESSAGE_TYPE, Codes::Authorization);
 
         query.exec();
         if(query.first())
         {
-            QByteArray hash = query.value("hash").toByteArray();
+            QByteArray hash = query.value("user_pwd").toByteArray();
             QString salt = query.value("salt").toString();
 
             if(createHashPwd(password, salt) == hash)
             {
                 UserIdType userId = query.value("user_id").value<UserIdType>();
                 QString userName = query.value("user_name").toString();
-                UserRole userRole = UserRole(query.value("user_role").toInt());
+                User::UserRole userRole = User::UserRole(query.value("user_role").toInt());
 
                 connectionHandler->setUserId(userId);
                 connectionHandler->setUserRole(userRole);
                 connectionHandler->setUserName(userName);
 
                 responseObj.insert(RESULT, RESULT_SUCCESS);
+                responseObj.insert(USER_NAME, userName);
+                responseObj.insert(USER_ROLE, userRole);
             }
             else
             {
@@ -141,4 +149,31 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
         break;
     }
     }
+}
+
+bool DatabaseAccessor::createUser(const QString &userLogin, const QString &userPassword, const QString &userName, User::UserRole userRole)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QString salt = createRandomString(saltLength);
+    auto pwdHash = createHashPwd(userPassword, salt);
+
+    QSqlQuery query(db);
+
+    query.prepare(QStringLiteral("INSERT INTO users (user_name, user_role, salt, user_pwd, user_login) "
+                                 "VALUES(:user_name, :user_role, :salt, :user_pwd, :user_login)"));
+    query.bindValue(":user_name", userName);
+    query.bindValue(":user_role", int(userRole));
+    query.bindValue(":salt", salt);
+    query.bindValue(":user_pwd", pwdHash);
+    query.bindValue(":user_login", userLogin);
+
+    if(query.exec())
+    {
+        MyDebug() << "create users SUCCESS";
+        return true;
+    }
+
+    MyDebug() << "create user FAILED" << query.lastError().text();
+    return false;
 }

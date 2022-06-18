@@ -6,6 +6,7 @@ Item {
     anchors.fill: parent
 
     signal showMessage(string text)
+    signal logInSuccess()
 
     Rectangle {
         id: idTopRectangle
@@ -57,6 +58,14 @@ Item {
             btnColor: Functions.mainColor
 
             onClicked: {
+                var login = idLoginInputField.text
+                var password = idPasswordInputField.text
+                if(login.length == 0 || password.length == 0)
+                {
+                    idRoot.showMessage("Заполните поля логина и пароля")
+                    return
+                }
+
                 console.log("enter button clicked")
                 if(connection.isConnected)
                 {
@@ -67,6 +76,20 @@ Item {
                     idRoot.showMessage("Нет соединения с сервером")
                 }
             }
+        }
+    }
+
+    Connections {
+        target: connection
+
+        function onLogInSuccess() {
+            console.log("log in SUCCESS");
+            idRoot.logInSuccess()
+        }
+
+        function onLogInFailed() {
+            console.log("log in FAILED");
+            idRoot.showMessage("Ошибка авторизации")
         }
     }
 }

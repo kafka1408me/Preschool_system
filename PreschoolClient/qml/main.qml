@@ -37,9 +37,20 @@ Window {
 
         Connections {
             target: idStackView.currentItem
+            ignoreUnknownSignals: true
 
             function onShowMessage(text) {
                 idMessageRectangle.showMessage(text)
+            }
+
+            function onLogInSuccess() {
+                idStackView.replace("MainServicePage.qml")
+            }
+
+            function onLogOut() {
+                idStackView.replace("LoginPage.qml")
+                userInfo.clearData()
+                connection.logOut()
             }
         }
     }

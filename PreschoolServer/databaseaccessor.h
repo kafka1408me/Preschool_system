@@ -19,6 +19,12 @@ public slots:
     void onRequest(const QJsonObject& obj, ConnectionHandler::ConnectionPtr connectionHandler);
 
 private:
+    bool createUser(const QString& userLogin,
+                    const QString& userPassword,
+                    const QString& userName,
+                    User::UserRole userRole);
+
+private:
     QSqlDatabase db;
 };
 

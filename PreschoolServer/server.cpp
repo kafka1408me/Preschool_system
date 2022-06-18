@@ -106,6 +106,8 @@ void Server::onNewConnection()
     ConnectionHandler::ConnectionPtr connectionHandler = ConnectionHandler::createConnectionHandler(pSocket);
     connect(connectionHandler.data(), &ConnectionHandler::connectionClosed,
             this, &Server::onConnectionClosed);
+    connect(connectionHandler.data(), &ConnectionHandler::requestDatabase,
+            m_databaseAccessor, &DatabaseAccessor::onRequest);
     m_connections.push_back(std::move(connectionHandler));
 }
 
