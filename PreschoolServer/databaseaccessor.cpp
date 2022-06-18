@@ -80,6 +80,7 @@ void DatabaseAccessor::start()
     createUser("admin", "admin", "Татьяна Алексеевна", User::UserRole::Admin);
     createUser("parent_0", "parent", "Алиса Хромова Петровна", User::UserRole::Parent);
     createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
+//    createChild("Алексей Хромов Иванович", 5, 10, 11);
 }
 
 void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::ConnectionPtr connectionHandler)
@@ -89,7 +90,6 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
     MyDebug() << Q_FUNC_INFO << obj;
 
     MyDebug() << Q_FUNC_INFO << obj;
-    QSqlQuery query(db);
 
     const int type = obj.value(MESSAGE_TYPE).toInt();
 
@@ -99,6 +99,8 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
     {
         QString login = obj.value(LOGIN).toString();
         QString password = obj.value(PASSWORD).toString();
+
+        QSqlQuery query(db);
 
         query.prepare(QStringLiteral("SELECT user_id, user_name, user_role, user_pwd, salt FROM users "
                                      "WHERE user_login=:user_login"));
@@ -170,10 +172,134 @@ bool DatabaseAccessor::createUser(const QString &userLogin, const QString &userP
 
     if(query.exec())
     {
-        MyDebug() << "create users SUCCESS";
+        MyDebug() << "create user SUCCESS";
         return true;
     }
 
     MyDebug() << "create user FAILED" << query.lastError().text();
     return false;
+}
+
+bool DatabaseAccessor::createChild(const QString &name, quint8 age, UserIdType parentId, UserIdType teacherId)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QSqlQuery query(db);
+
+    query.prepare(QStringLiteral("INSERT INTO children (name, age, parent_id, teacher_id) "
+                                 "VALUES(:name, :age, :parent_id, :teacher_id)"));
+    query.bindValue(":name", name);
+    query.bindValue(":age", age);
+    query.bindValue(":parent_id", parentId);
+    query.bindValue(":teacher_id", teacherId);
+
+    if(query.exec())
+    {
+        MyDebug() << "create child SUCCESS";
+        return true;
+    }
+
+    MyDebug() << "create child FAILED" << query.lastError().text();
+    return false;
+}
+
+QJsonArray DatabaseAccessor::getAllParents()
+{
+    return getAllUsersByRole(User::UserRole::Parent);
+}
+
+QJsonArray DatabaseAccessor::getAllTeachers()
+{
+    return getAllUsersByRole(User::UserRole::Teacher);
+}
+
+QJsonArray DatabaseAccessor::getAllUsersByRole(User::UserRole role)
+{
+    QSqlQuery query(db);
+
+    QJsonArray users;
+
+    query.prepare(QStringLiteral("SELECT user_id, user_name, user_login FROM users WHERE user_role=:user_role"));
+    query.bindValue(":user_role", role);
+
+    if(query.exec())
+    {
+        QJsonObject user;
+
+        while (query.next())
+        {
+            user[Protocol::USER_NAME] = query.value("user_name").toString();
+            user[Protocol::LOGIN] = query.value("user_login").toString();
+            user[Protocol::USER_ID] = query.value("user_id").toString();
+
+            users.push_back(user);
+        }
+    }
+    else
+    {
+        MyDebug() << "get users byr role" << role << "FAILED";
+    }
+    return users;
+}
+
+QJsonArray DatabaseAccessor::getChildren(bool forParent, UserIdType id)
+{
+    QSqlQuery query(db);
+    QJsonArray children;
+
+    QString queryText = "SELECT id, name, age, parent_id, teacher_id FROM children";
+    if(id != DefaultUserId)
+    {
+        if(forParent)
+        {
+            queryText += " WHERE parent_id=:id";
+        }
+        else
+        {
+            queryText += " WHERE teacher_id=:id";
+        }
+        query.prepare(queryText);
+        query.bindValue(":id", id);
+    }
+    else
+    {
+        query.prepare(queryText);
+    }
+
+    if(query.exec())
+    {
+        QJsonObject child;
+
+        while (query.next())
+        {
+            child[Protocol::CHILD_NAME] = query.value("name").toString();
+            child[Protocol::CHILD_AGE] = query.value("age").toString();
+            child[Protocol::CHILD_ID] = query.value("id").toString();
+            child[Protocol::CHILD_PARENT_ID] = qint64(query.value("parent_id").value<UserIdType>());
+            child[Protocol::CHILD_TEACHER_ID] = qint64(query.value("teacher_id").value<UserIdType>());
+
+            children.push_back(child);
+        }
+    }
+    else
+    {
+        MyDebug() << "get all children FAILED";
+    }
+    return children;
+}
+
+QJsonArray DatabaseAccessor::getAllChildren()
+{
+    return getChildren();
+}
+
+
+QJsonArray DatabaseAccessor::getChildrenForTeacher(UserIdType id)
+{
+    return getChildren(false, id);
+}
+
+QJsonArray DatabaseAccessor::getChildrenForParent(UserIdType id)
+{
+    return getChildren(true, id);
 }

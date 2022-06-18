@@ -9,7 +9,9 @@ SOURCES += \
     connectionwrapper.cpp \
     main.cpp \
     registertypes.cpp \
-    userinfo.cpp
+    userinfo.cpp \
+    usersmodel.cpp \
+    usersproxymodel.cpp
 
 RESOURCES += \
     qml.qrc
@@ -18,6 +20,8 @@ HEADERS += \
     connection.h \
     ../PreschoolServer/Codes.h \
     connectionwrapper.h \
-    userinfo.h
+    userinfo.h \
+    usersmodel.h \
+    usersproxymodel.h
 
 INCLUDEPATH += ../PreschoolServer

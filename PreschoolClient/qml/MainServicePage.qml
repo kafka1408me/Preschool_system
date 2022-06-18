@@ -13,12 +13,16 @@ Item {
         {name:"Тесты", action: function(){}},
         {name:"Оплата", action: function(){}}
     ]
-    property var tabsTeacher: [{name:"Все дети",
+    property var tabsTeacher: [{name:"Дети",
         action: function(){}},
         {name:"Создать тесты", action: function(){}}
     ]
-    property var tabsAdmin: [{name:"Пользователи",
-            action:function(){}}
+    property var tabsAdmin: [{name:"Родители",
+            action:function(){}},
+        {name:"Воспитатели",
+                    action:function(){}},
+        {name:"Дети",
+                    action:function(){}}
     ]
 
     MyButton {
