@@ -5,6 +5,8 @@ Item {
     id: idRoot
     anchors.fill: parent
 
+    signal showMessage(string text)
+
     Rectangle {
         id: idTopRectangle
         anchors.left: parent.left
@@ -53,6 +55,18 @@ Item {
             y: idInputFieldsArea.y + idInputFieldsArea.height + 50
             btnText: "Войти"
             btnColor: Functions.mainColor
+
+            onClicked: {
+                console.log("enter button clicked")
+                if(connection.isConnected)
+                {
+                    connection.logIn(idLoginInputField.text, idPasswordInputField.text)
+                }
+                else
+                {
+                    idRoot.showMessage("Нет соединения с сервером")
+                }
+            }
         }
     }
 }

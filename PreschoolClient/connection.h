@@ -14,7 +14,18 @@ public:
 
     ~Connection();
 
+private:
+    void setIsConnected(bool connected);
+
+    void sendMessage(const QJsonObject& obj);
+
+signals:
+    void isConnectedChanged(bool connected);
+
+public slots:
     void start();
+
+    void logIn(const QString& login, const QString& password);
 
 private slots:
     void onTextMessageReceived(const QString& message);

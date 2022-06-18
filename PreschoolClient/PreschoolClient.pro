@@ -6,13 +6,18 @@ TARGET = PreschoolClient
 
 SOURCES += \
     connection.cpp \
-    main.cpp
+    connectionwrapper.cpp \
+    main.cpp \
+    registertypes.cpp \
+    userinfo.cpp
 
 RESOURCES += \
     qml.qrc
 
 HEADERS += \
     connection.h \
-    ../PreschoolServer/Codes.h
+    ../PreschoolServer/Codes.h \
+    connectionwrapper.h \
+    userinfo.h
 
 INCLUDEPATH += ../PreschoolServer

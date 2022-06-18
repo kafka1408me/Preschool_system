@@ -2,6 +2,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QFile>
 #include <QTimer>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include "connection.h"
 #include "Codes.h"
 
@@ -12,6 +14,7 @@ Connection::Connection(const QUrl& url, QObject *parent) :
     m_url(url)
 {
     MyDebug() << "construct";
+    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
 }
 
 Connection::~Connection()
@@ -20,6 +23,28 @@ Connection::~Connection()
     {
         m_socket->close();
     }
+}
+
+
+void Connection::setIsConnected(bool connected)
+{
+    if(m_isConnected == connected)
+    {
+        return;
+    }
+
+    m_isConnected = connected;
+    emit isConnectedChanged(m_isConnected);
+}
+
+void Connection::sendMessage(const QJsonObject &obj)
+{
+    MyDebug() << "send message" << obj;
+
+    QJsonDocument doc{obj};
+    QString message = doc.toJson(QJsonDocument::Compact);
+
+    m_socket->sendTextMessage(message);
 }
 
 void Connection::start()
@@ -52,6 +77,19 @@ void Connection::start()
     tryConnect();
 }
 
+void Connection::logIn(const QString &login, const QString &password)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::Authorization},
+        {Protocol::LOGIN, login},
+        {Protocol::PASSWORD, password}
+    };
+
+    sendMessage(obj);
+}
+
 void Connection::onTextMessageReceived(const QString &message)
 {
     MyDebug() << Q_FUNC_INFO;
@@ -60,13 +98,13 @@ void Connection::onTextMessageReceived(const QString &message)
 void Connection::onConnected()
 {
     MyDebug() << Q_FUNC_INFO;
-    m_isConnected = true;
+    setIsConnected(true);
 }
 
 void Connection::onDisconnected()
 {
     MyDebug() << Q_FUNC_INFO;
-    m_isConnected = false;
+    setIsConnected(false);
 
     QTimer::singleShot(5000, this, &Connection::tryConnect);
 }

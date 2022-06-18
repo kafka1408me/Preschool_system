@@ -3,17 +3,25 @@
 #include <QString>
 
 using UserIdType = quint64;
+#include <QObject>
+
 
 const UserIdType DefaultUserId{0};
 
 constexpr const int DefaultPort = 19653;
 
+namespace User
+{
+Q_NAMESPACE
 enum UserRole
 {
     Parent  = 1,
     Teacher = 2,
     Admin   = 3
 };
+Q_ENUM_NS(UserRole)
+}
+
 
 namespace Protocol
 {

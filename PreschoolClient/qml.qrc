@@ -8,5 +8,6 @@
         <file>Functions.js</file>
         <file>qml/InputFieldWithDescription.qml</file>
         <file>qml/MyButton.qml</file>
+        <file>qml/MainServicePage.qml</file>
     </qresource>
 </RCC>
