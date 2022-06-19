@@ -17,8 +17,10 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::logOut, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryGetAllUsers,
             m_connection.get(), &Connection::getAllUsers, Qt::QueuedConnection);
-    connect(this, &ConnectionWrapper::tryGetAllChildren,
-            m_connection.get(), &Connection::getAllChildren, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetChildren,
+            m_connection.get(), &Connection::getChildren, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetChildTeacher,
+            m_connection.get(), &Connection::getChildTeacher, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -65,6 +67,16 @@ void ConnectionWrapper::getAllUsers()
 void ConnectionWrapper::getAllChildren()
 {
     emit tryGetAllChildren();
+}
+
+void ConnectionWrapper::getChildren()
+{
+    emit tryGetChildren();
+}
+
+void ConnectionWrapper::getChildTeacher()
+{
+    emit tryGetChildTeacher();
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

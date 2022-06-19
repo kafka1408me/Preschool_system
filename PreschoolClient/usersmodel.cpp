@@ -113,3 +113,22 @@ void UsersModel::setUsers(const QJsonArray &array)
     endResetModel();
 }
 
+const PreschoolUser *UsersModel::getUserById(UserIdType id)
+{
+    auto it = std::find_if(m_users.begin(), m_users.end(), [id](const PreschoolUser& user) {
+        return user.getUserId() == id;
+    });
+    if(it != m_users.end())
+    {
+        return &(*it);
+    }
+    return nullptr;
+}
+
+void UsersModel::clear()
+{
+    beginResetModel();
+    m_users.clear();
+    endResetModel();
+}
+

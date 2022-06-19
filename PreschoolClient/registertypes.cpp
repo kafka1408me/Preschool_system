@@ -9,11 +9,23 @@ static void registerTypes()
 
     qRegisterMetaType<User::UserRole>("UserRole");
 
+    qRegisterMetaType<Gender>("Gender");
+
+    qRegisterMetaType<UserIdType>("UserIdType");
+
     qmlRegisterUncreatableMetaObject(
                 User::staticMetaObject,       // static meta object
                 "preschool",             // import statement (can be any string)
                 1, 0,                          // major and minor version of the import
                 "UserRole",                       // name in QML (does not have to match C++ name)
+                "Error: only enums"            // error in case someone tries to create a MyNamespace object
+                );
+
+    qmlRegisterUncreatableMetaObject(
+                User::staticMetaObject,       // static meta object
+                "preschool",             // import statement (can be any string)
+                1, 0,                          // major and minor version of the import
+                "Gender",                       // name in QML (does not have to match C++ name)
                 "Error: only enums"            // error in case someone tries to create a MyNamespace object
                 );
 }

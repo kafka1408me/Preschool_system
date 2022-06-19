@@ -40,7 +40,7 @@ Item {
                 inputFieldWith: idBottomArea.width * 0.3
                 descriptionText: "Логин"
 
-                text: "admin"
+                text: "parent_0"
             }
             InputFieldWithDescription {
                 id: idPasswordInputField
@@ -48,7 +48,7 @@ Item {
                 descriptionText: "Пароль"
                 echoMode: TextInput.Password
 
-                text: "admin"
+                text: "parent"
             }
         }
 

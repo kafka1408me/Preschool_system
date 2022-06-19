@@ -38,8 +38,9 @@ enum Codes
 {
     Authorization   = 1,
     LogOut          = 2,
-    GetAllChildren  = 3,
+    GetChildren     = 3,
     GetAllUsers     = 4,
+    GetChildTeacher = 5
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -53,7 +54,7 @@ const QString USER_ROLE = "user_role";
 const QString USER_ID = "user_id";
 
 const QString USERS = "users";
-const QString CHILDREN = "choldren";
+const QString CHILDREN = "children";
 
 const QString CHILD_ID = "id";
 const QString CHILD_NAME = "name";

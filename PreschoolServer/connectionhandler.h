@@ -19,10 +19,19 @@ public:
     void sendMessage(const QJsonObject& obj);
 
     void setUserId(UserIdType id);
+    UserIdType getUserId() const;
 
     void setUserName(const QString& name);
+    QString getUserName() const;
 
     void setUserRole(User::UserRole role);
+    UserRole getUserRole() const;
+
+    bool isUserAdmin() const;
+
+    bool isUserParent() const;
+
+    bool isUserTeacher() const;
 
 private:
     explicit ConnectionHandler(QWebSocket* socket, QObject *parent = nullptr);

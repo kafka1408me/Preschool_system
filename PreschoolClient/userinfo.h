@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include "childrenmodel.h"
+#include "proxychildrenmodel.h"
 #include "usersmodel.h"
 #include "usersproxymodel.h"
 #include "Codes.h"
@@ -26,6 +28,10 @@ public:
 
     Q_INVOKABLE void setUsersRoleForModel(UserRole usersRole);
 
+    Q_INVOKABLE QVariantMap getChild(int index);
+
+    Q_INVOKABLE void setChildIdForShowing(UserIdType id);
+
     QString getUserName() const;
 
     User::UserRole getUserRole() const;
@@ -41,7 +47,7 @@ public slots:
 
     void setUsers(const QJsonArray& users);
 
-    void setChildren(const QJsonArray& users);
+    void setChildren(const QJsonArray& array);
 
 private:
     UserInfo();
@@ -56,5 +62,7 @@ private:
     QScopedPointer<UsersModel> m_usersModel;
     QScopedPointer<UsersProxyModel> m_proxyUsersModel;
     QScopedPointer<ChildrenModel> m_childrenModel;
+    QScopedPointer<ProxyChildrenModel> m_childrenProxyModel;
+
 };
 

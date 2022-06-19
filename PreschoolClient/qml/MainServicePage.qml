@@ -10,7 +10,16 @@ Item {
     signal showMessage(string text)
     signal logOut()
 
-    property var tabsParent: [{name:"Мой ребенок", action: function(){}},
+    property var tabsParent: [{name:"Мой ребенок",
+            action: function(){
+                var child = userInfo.getChild(0)
+                if(Object.keys(child).length > 0)
+                {
+                    console.log("child", child.id)
+                    userInfo.setChildIdForShowing(child.id)
+                }
+                idRightAreaStackView.replace("MyChildPage.qml")
+            }},
         {name:"Тесты", action: function(){}},
         {name:"Оплата", action: function(){}}
     ]
@@ -31,16 +40,21 @@ Item {
                         idRightAreaStackView.replace("PeoplePage.qml", {"usersRole":UserRole.Admin})
                     }},
         {name:"Дети",
-                    action:function(){}}
+                    action:function(){
+                        idRightAreaStackView.replace("PeoplePage.qml", {"isShowUsers":false})
+                    }}
     ]
 
     MyButton {
+        id: idExitButton
         btnText: "Выйти"
         y: parent.height - height - 30
         x: parent.width - width - 30
         width: 150
         height: 50
         btnColor: Functions.mainColor
+
+        z: 100
 
         onClicked: {
             console.log("log out button clicked")
@@ -165,10 +179,12 @@ Item {
                 {
                 case UserRole.Teacher: {
                     model = tabsTeacher
+                    tabsTeacher[0].action()
                     break
                 }
                 case UserRole.Parent : {
                     model = tabsParent
+                    tabsParent[0].action()
                     break
                 }
                 case UserRole.Admin: {
@@ -190,7 +206,7 @@ Item {
             bottom: parent.bottom
         }
 
-        property int animationDuration: 400
+        property int animationDuration: 300
 
         pushEnter: Transition {
             PropertyAnimation {
@@ -251,9 +267,10 @@ Item {
 
     Component.onCompleted: {
         console.log("completed !", userInfo.userRole)
-        if(userInfo.userRole === UserRole.Admin)
-        {
-            connection.getAllUsers()
-        }
+//        if(userInfo.userRole === UserRole.Admin)
+//        {
+//            connection.getAllUsers()
+//        }
+//        connection.getChildren()
     }
 }

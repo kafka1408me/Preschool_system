@@ -39,7 +39,7 @@ private:
 
     QJsonArray getAllUsers();
 
-    QJsonArray getChildren(bool forParent = false, UserIdType id = DefaultUserId);
+    QJsonArray getChildren(UserRole userRole = UserRole::Admin, UserIdType id = DefaultUserId);
 
     QJsonArray getAllChildren();
 

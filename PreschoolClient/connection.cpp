@@ -133,12 +133,23 @@ void Connection::getAllUsers()
     sendMessage(obj);
 }
 
-void Connection::getAllChildren()
+void Connection::getChildren()
 {
     MyDebug() << Q_FUNC_INFO;
 
     QJsonObject obj {
-        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetAllChildren},
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetChildren},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::getChildTeacher()
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetChildTeacher},
     };
 
     sendMessage(obj);
@@ -195,12 +206,21 @@ void Connection::onTextMessageReceived(const QString &message)
         }
         break;
     }
-    case Protocol::Codes::GetAllChildren:
+    case Protocol::Codes::GetChildren:
     {
         if(result == Protocol::RESULT_SUCCESS)
         {
             QJsonArray children = obj.value(Protocol::CHILDREN).toArray();
             emit childrenReceived(children);
+        }
+        break;
+    }
+    case Protocol::Codes::GetChildTeacher:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QJsonArray users = obj.value(Protocol::USERS).toArray();
+            emit usersReceived(users);
         }
         break;
     }

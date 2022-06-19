@@ -44,6 +44,10 @@ public:
 
     void setUsers(const QJsonArray& array);
 
+    const PreschoolUser *getUserById(UserIdType id);
+
+    void clear();
+
 private:
     QVector<PreschoolUser> m_users;
 };

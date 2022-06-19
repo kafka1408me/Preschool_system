@@ -13,5 +13,10 @@
         <file>images/user.png</file>
         <file>images/boy.png</file>
         <file>images/girl.png</file>
+        <file>images/boy2.png</file>
+        <file>images/girl2.png</file>
+        <file>images/plus.png</file>
+        <file>qml/MyButtonWithPlus.qml</file>
+        <file>qml/MyChildPage.qml</file>
     </qresource>
 </RCC>

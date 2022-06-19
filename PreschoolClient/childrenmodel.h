@@ -5,17 +5,25 @@
 
 class UsersModel;
 
+#define ADD_MEMBER(type, name, getter, setter) \
+    private: \
+        type name; \
+    public: \
+    type getter () const {return name;} \
+    void setter(const type& x){name = x;}
+
+
 class Child
 {
-    Child(UserIdType id, UserIdType parentId, UserIdType teacher_id, quint8 age, Gender gender, const QString& name);
+public:
+    Child() = default;
 
-private:
-    UserIdType m_id;
-    UserIdType m_parentId;
-    UserIdType m_teacherId;
-    quint8 m_age;
-    Gender m_gender;
-    QString m_name;
+    ADD_MEMBER(UserIdType, m_id, getId, setId)
+    ADD_MEMBER(UserIdType, m_parentId, getParentId, setParentId)
+    ADD_MEMBER(UserIdType, m_teacherId, getTeacherId, setTeacherId)
+    ADD_MEMBER(quint8, m_age, getAge, setAge)
+    ADD_MEMBER(Gender, m_gender, getGender, setGender)
+    ADD_MEMBER(QString, m_name, getName, setName)
 };
 
 class ChildrenModel : public QAbstractListModel
@@ -28,6 +36,7 @@ public:
         ChildTeacherId,
         ChildAge,
         ChildGender,
+        ChildName,
         ChildParentName,
         ChildTeacherName
     };
@@ -41,6 +50,10 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void setChildren(const QJsonArray& array);
+
+    void clear();
+
+    QVariantMap getItemMap(int _index);
 
 private:
     UsersModel* m_usersModel;

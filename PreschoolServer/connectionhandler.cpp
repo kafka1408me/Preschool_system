@@ -25,14 +25,39 @@ void ConnectionHandler::setUserId(UserIdType id)
     m_userId = id;
 }
 
+UserIdType ConnectionHandler::getUserId() const
+{
+    return m_userId;
+}
+
 void ConnectionHandler::setUserName(const QString &name)
 {
     m_userName = name;
 }
 
+QString ConnectionHandler::getUserName() const
+{
+    return m_userName;
+}
+
 void ConnectionHandler::setUserRole(User::UserRole role)
 {
     m_userRole = role;
+}
+
+UserRole ConnectionHandler::getUserRole() const
+{
+    return m_userRole;
+}
+
+bool ConnectionHandler::isUserAdmin() const
+{
+    return m_userId != DefaultUserId && m_userRole == UserRole::Admin;
+}
+
+bool ConnectionHandler::isUserParent() const
+{
+    return m_userId != DefaultUserId && m_userRole == UserRole::Parent;
 }
 
 ConnectionHandler::ConnectionHandler(QWebSocket* socket, QObject *parent) :
@@ -106,7 +131,7 @@ void ConnectionHandler::onMessageReceived(const QString &message)
     }
     case Protocol::Codes::GetAllUsers:
     {
-        if(m_userId != DefaultUserId && m_userRole == UserRole::Admin)
+        if(isUserAdmin())
         {
             emit requestDatabase(obj, sharedFromThis());
         }
@@ -115,6 +140,29 @@ void ConnectionHandler::onMessageReceived(const QString &message)
             sendResultFailMessage(Protocol::Codes(type));
         }
         break;
+    }
+    case Protocol::Codes::GetChildren:
+    {
+        if(m_userId != DefaultUserId)
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
+        break;
+    }
+    case Protocol::Codes::GetChildTeacher:
+    {
+        if(isUserParent())
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
     }
     default:
     {

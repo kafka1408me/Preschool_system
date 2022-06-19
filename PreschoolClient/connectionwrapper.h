@@ -25,6 +25,10 @@ public:
 
     Q_INVOKABLE void getAllChildren();
 
+    Q_INVOKABLE void getChildren();
+
+    Q_INVOKABLE void getChildTeacher();
+
 signals:
     void startConnecting();
 
@@ -41,6 +45,10 @@ signals:
     void tryGetAllUsers();
 
     void tryGetAllChildren();
+
+    void tryGetChildren();
+
+    void tryGetChildTeacher();
 
 private slots:
     void onConnectedChanged(bool connected);

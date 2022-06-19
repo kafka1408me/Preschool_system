@@ -5,7 +5,6 @@
 #include <QSaveFile>
 #include <QDir>
 #include "userinfo.h"
-#include "childrenmodel.h"
 
 const QString userName = QStringLiteral("userName");
 const QString userRole = QStringLiteral("userRole");
@@ -53,6 +52,7 @@ UserInfo::UserInfo()
     m_usersModel.reset(new UsersModel);
     m_proxyUsersModel.reset(new UsersProxyModel(m_usersModel.data()));
     m_childrenModel.reset(new ChildrenModel(m_usersModel.data()));
+    m_childrenProxyModel.reset(new ProxyChildrenModel(m_childrenModel.data()));
 
     getData();
 }
@@ -69,14 +69,10 @@ void UserInfo::clearData()
 
     m_userName = "";
 
-    if(m_usersModel)
-    {
-        m_usersModel.reset();
-    }
-    if(m_proxyUsersModel)
-    {
-        m_proxyUsersModel.reset();
-    }
+    m_usersModel->clear();
+    m_childrenModel->clear();
+
+    m_childrenProxyModel->setId(DefaultUserId);
 
     QFile f(getDataFileName());
     f.remove();
@@ -85,6 +81,16 @@ void UserInfo::clearData()
 void UserInfo::setUsersRoleForModel(UserRole usersRole)
 {
     m_proxyUsersModel->setUsersRole(usersRole);
+}
+
+QVariantMap UserInfo::getChild(int index)
+{
+    return m_childrenModel->getItemMap(index);
+}
+
+void UserInfo::setChildIdForShowing(UserIdType id)
+{
+    m_childrenProxyModel->setId(id);
 }
 
 void UserInfo::setUserName(const QString &name)
@@ -109,6 +115,7 @@ void UserInfo::setUsers(const QJsonArray &users)
 
 void UserInfo::setChildren(const QJsonArray &array)
 {
+    MyDebug() << Q_FUNC_INFO;
     m_childrenModel->setChildren(array);
 }
 
@@ -129,7 +136,7 @@ QAbstractItemModel *UserInfo::getUsersProxyModel() const
 
 QAbstractItemModel *UserInfo::getChildrenModel() const
 {
-    return m_childrenModel.data();
+    return m_childrenProxyModel.data();
 }
 
 void UserInfo::save()

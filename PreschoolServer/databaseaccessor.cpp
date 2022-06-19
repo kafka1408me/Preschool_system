@@ -161,15 +161,51 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
 
         break;
     }
-    case Codes::GetAllChildren:
+    case Codes::GetChildren:
     {
-        QJsonArray array = getAllChildren();
+        QJsonArray array;
+
+        UserRole userRole = connectionHandler->getUserRole();
+        UserIdType userId = connectionHandler->getUserId();
+
+        array = getChildren(userRole, userId);
 
         QJsonObject responseObj;
         responseObj.insert(MESSAGE_TYPE, type);
 
         responseObj.insert(RESULT, RESULT_SUCCESS);
         responseObj.insert(CHILDREN, array);
+
+        connectionHandler->sendMessage(responseObj);
+
+        break;
+    }
+    case Codes::GetChildTeacher:
+    {
+        QSqlQuery query(db);
+
+        query.prepare("SELECT user_id, user_name FROM users WHERE user_id IN (SELECT teacher_id FROM children WHERE parent_id=:id)");
+        query.bindValue(":id", connectionHandler->getUserId());
+
+        QJsonObject responseObj;
+        responseObj.insert(Protocol::MESSAGE_TYPE, type);
+
+        query.exec();
+        if(query.first())
+        {
+            QJsonObject teacherObj;
+            teacherObj.insert(Protocol::USER_ID, query.value("user_id").value<qint64>());
+            teacherObj.insert(Protocol::USER_NAME, query.value("user_name").toString());
+
+            responseObj.insert(Protocol::USERS, QJsonArray({teacherObj}));
+
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+        else
+        {
+            MyDebug() << "get child teacher FAILED" << query.lastError().text();
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
 
         connectionHandler->sendMessage(responseObj);
 
@@ -302,15 +338,15 @@ QJsonArray DatabaseAccessor::getAllUsers()
     return users;
 }
 
-QJsonArray DatabaseAccessor::getChildren(bool forParent, UserIdType id)
+QJsonArray DatabaseAccessor::getChildren(UserRole userRole, UserIdType id)
 {
     QSqlQuery query(db);
     QJsonArray children;
 
     QString queryText = "SELECT id, name, age, gender, parent_id, teacher_id FROM children";
-    if(id != DefaultUserId)
+    if(userRole != UserRole::Admin)
     {
-        if(forParent)
+        if(userRole == UserRole::Parent)
         {
             queryText += " WHERE parent_id=:id";
         }
@@ -333,7 +369,7 @@ QJsonArray DatabaseAccessor::getChildren(bool forParent, UserIdType id)
         while (query.next())
         {
             child[Protocol::CHILD_NAME] = query.value("name").toString();
-            child[Protocol::CHILD_AGE] = query.value("age").toString();
+            child[Protocol::CHILD_AGE] = query.value("age").toInt();
             child[Protocol::CHILD_ID] = query.value("id").toString();
             child[Protocol::CHILD_PARENT_ID] = query.value("parent_id").value<qint64>();
             child[Protocol::CHILD_TEACHER_ID] = query.value("teacher_id").value<qint64>();
@@ -357,10 +393,10 @@ QJsonArray DatabaseAccessor::getAllChildren()
 
 QJsonArray DatabaseAccessor::getChildrenForTeacher(UserIdType id)
 {
-    return getChildren(false, id);
+    return getChildren(UserRole::Teacher, id);
 }
 
 QJsonArray DatabaseAccessor::getChildrenForParent(UserIdType id)
 {
-    return getChildren(true, id);
+    return getChildren(UserRole::Parent, id);
 }

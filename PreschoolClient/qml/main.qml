@@ -2,9 +2,11 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.12
 
+import preschool 1.0
+
 Window {
     id: idMainWindow
-    width: Screen.width * 0.6
+    width: Screen.width * 0.62
     height: width * 0.7
     visible: true
 
@@ -45,6 +47,16 @@ Window {
 
             function onLogInSuccess() {
                 idStackView.replace("MainServicePage.qml")
+                if(userInfo.userRole === UserRole.Admin)
+                {
+                    connection.getAllUsers()
+                }
+                connection.getChildren()
+
+                if(userInfo.userRole === UserRole.Parent)
+                {
+                    connection.getChildTeacher()
+                }
             }
 
             function onLogOut() {

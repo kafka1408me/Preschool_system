@@ -49,7 +49,9 @@ public slots:
 
     void getAllUsers();
 
-    void getAllChildren();
+    void getChildren();
+
+    void getChildTeacher();
 
 private slots:
     void onTextMessageReceived(const QString& message);
