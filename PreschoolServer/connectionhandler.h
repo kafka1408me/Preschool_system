@@ -27,6 +27,8 @@ public:
 private:
     explicit ConnectionHandler(QWebSocket* socket, QObject *parent = nullptr);
 
+    void sendResultFailMessage(Protocol::Codes code);
+
 signals:
     void connectionClosed(ConnectionPtr connectionHandler);
 

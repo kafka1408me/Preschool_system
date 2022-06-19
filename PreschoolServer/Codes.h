@@ -20,7 +20,15 @@ enum UserRole
     Admin   = 3
 };
 Q_ENUM_NS(UserRole)
+enum Gender
+{
+    Male   = 1,
+    Female = 2
+};
+Q_ENUM_NS(Gender)
 }
+
+using namespace User;
 
 
 namespace Protocol
@@ -31,8 +39,7 @@ enum Codes
     Authorization   = 1,
     LogOut          = 2,
     GetAllChildren  = 3,
-    GetAllParents   = 4,
-    GetAllTeachers  = 5
+    GetAllUsers     = 4,
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -45,11 +52,15 @@ const QString USER_NAME = "user_name";
 const QString USER_ROLE = "user_role";
 const QString USER_ID = "user_id";
 
+const QString USERS = "users";
+const QString CHILDREN = "choldren";
+
 const QString CHILD_ID = "id";
 const QString CHILD_NAME = "name";
 const QString CHILD_AGE = "age";
 const QString CHILD_PARENT_ID = "parent_id";
 const QString CHILD_TEACHER_ID = "teacher_id";
+const QString CHILD_GENDER = "gender";
 
 constexpr int RESULT_SUCCESS = 0;
 constexpr int RESULT_FAIL = 1;

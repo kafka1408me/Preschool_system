@@ -33,7 +33,7 @@ Window {
     StackView {
         id: idStackView
         anchors.fill: parent
-        initialItem: "MainServicePage.qml" // "LoginPage.qml"
+        initialItem: "LoginPage.qml"
 
         Connections {
             target: idStackView.currentItem

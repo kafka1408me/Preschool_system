@@ -21,6 +21,10 @@ public:
 
     Q_INVOKABLE void logOut();
 
+    Q_INVOKABLE void getAllUsers();
+
+    Q_INVOKABLE void getAllChildren();
+
 signals:
     void startConnecting();
 
@@ -33,6 +37,10 @@ signals:
     void logInFailed();
 
     void tryLogOut();
+
+    void tryGetAllUsers();
+
+    void tryGetAllChildren();
 
 private slots:
     void onConnectedChanged(bool connected);

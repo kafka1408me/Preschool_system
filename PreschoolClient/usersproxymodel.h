@@ -11,12 +11,10 @@ public:
 
     void setUsersRole(User::UserRole role);
 
-    void getUsersRole() const;
-
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
-    User::UserRole m_usersRole;
+    User::UserRole m_usersRole{UserRole::Parent};
 };
 

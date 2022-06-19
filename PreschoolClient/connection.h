@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QUrl>
 #include <QSslError>
+#include <QJsonArray>
 #include "Codes.h"
 
 class QWebSocket;
@@ -35,12 +36,20 @@ signals:
 
     void userRoleReceived(User::UserRole userRole);
 
+    void usersReceived(const QJsonArray& users);
+
+    void childrenReceived(const QJsonArray& users);
+
 public slots:
     void start();
 
     void logIn(const QString& login, const QString& password);
 
     void logOut();
+
+    void getAllUsers();
+
+    void getAllChildren();
 
 private slots:
     void onTextMessageReceived(const QString& message);

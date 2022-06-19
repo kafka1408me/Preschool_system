@@ -6,6 +6,9 @@ Button {
     id: idRoot
     property color btnColor: '#2a2c36'
     property alias btnText: btnTxt.text
+    property alias btnRadius: buttonRect.radius
+    property real btnBorderWidth: 0
+    property color btnBorderColor: "transparent"
 
     property var btnPressedColor: Functions.makeMoreDarkColor(btnColor)
 
@@ -13,6 +16,10 @@ Button {
         id: buttonRect
         color: idRoot.down ? btnPressedColor : btnColor
         radius: height / 2
+        border {
+            width: idRoot.btnBorderWidth
+            color: idRoot.btnBorderColor
+        }
 
         Text{
             id: btnTxt

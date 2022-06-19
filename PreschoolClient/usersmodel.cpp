@@ -108,6 +108,8 @@ void UsersModel::setUsers(const QJsonArray &array)
         m_users.push_back(PreschoolUser{id, name, login, role});
     }
 
+    qDebug() << "users count" << m_users.size();
+
     endResetModel();
 }
 

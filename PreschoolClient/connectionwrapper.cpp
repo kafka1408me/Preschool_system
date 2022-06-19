@@ -15,6 +15,10 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::logIn, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryLogOut,
             m_connection.get(), &Connection::logOut, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetAllUsers,
+            m_connection.get(), &Connection::getAllUsers, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetAllChildren,
+            m_connection.get(), &Connection::getAllChildren, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -51,6 +55,16 @@ void ConnectionWrapper::logIn(const QString &login, const QString &password)
 void ConnectionWrapper::logOut()
 {
     emit tryLogOut();
+}
+
+void ConnectionWrapper::getAllUsers()
+{
+    emit tryGetAllUsers();
+}
+
+void ConnectionWrapper::getAllChildren()
+{
+    emit tryGetAllChildren();
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

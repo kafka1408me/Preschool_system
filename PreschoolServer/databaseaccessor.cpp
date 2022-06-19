@@ -79,8 +79,10 @@ void DatabaseAccessor::start()
 
     createUser("admin", "admin", "Татьяна Алексеевна", User::UserRole::Admin);
     createUser("parent_0", "parent", "Алиса Хромова Петровна", User::UserRole::Parent);
+    createUser("parent_1", "parent", "Артем Дуров Иванович", User::UserRole::Parent);
     createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
-//    createChild("Алексей Хромов Иванович", 5, 10, 11);
+    createChild("Алексей Хромов Иванович",  5, Gender::Male, 10, 11);
+    createChild("Дарья Дурова Артемовна", 4, Gender::Female, 26, 11);
 }
 
 void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::ConnectionPtr connectionHandler)
@@ -97,7 +99,7 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
     {
     case Codes::Authorization:
     {
-        QString login = obj.value(LOGIN).toString();
+        QString login = obj.value(USER_LOGIN).toString();
         QString password = obj.value(PASSWORD).toString();
 
         QSqlQuery query(db);
@@ -145,6 +147,34 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
 
         break;
     }
+    case Codes::GetAllUsers:
+    {
+        QJsonArray array = getAllUsers();
+
+        QJsonObject responseObj;
+        responseObj.insert(MESSAGE_TYPE, type);
+
+        responseObj.insert(RESULT, RESULT_SUCCESS);
+        responseObj.insert(USERS, array);
+
+        connectionHandler->sendMessage(responseObj);
+
+        break;
+    }
+    case Codes::GetAllChildren:
+    {
+        QJsonArray array = getAllChildren();
+
+        QJsonObject responseObj;
+        responseObj.insert(MESSAGE_TYPE, type);
+
+        responseObj.insert(RESULT, RESULT_SUCCESS);
+        responseObj.insert(CHILDREN, array);
+
+        connectionHandler->sendMessage(responseObj);
+
+        break;
+    }
     default:
     {
         MyWarning() << "undefined message type" << type;
@@ -180,16 +210,17 @@ bool DatabaseAccessor::createUser(const QString &userLogin, const QString &userP
     return false;
 }
 
-bool DatabaseAccessor::createChild(const QString &name, quint8 age, UserIdType parentId, UserIdType teacherId)
+bool DatabaseAccessor::createChild(const QString &name, quint8 age, Gender gender, UserIdType parentId, UserIdType teacherId)
 {
     MyDebug() << Q_FUNC_INFO;
 
     QSqlQuery query(db);
 
-    query.prepare(QStringLiteral("INSERT INTO children (name, age, parent_id, teacher_id) "
-                                 "VALUES(:name, :age, :parent_id, :teacher_id)"));
+    query.prepare(QStringLiteral("INSERT INTO children (name, age, gender, parent_id, teacher_id) "
+                                 "VALUES(:name, :age, :gender, :parent_id, :teacher_id)"));
     query.bindValue(":name", name);
     query.bindValue(":age", age);
+    query.bindValue(":gender", gender);
     query.bindValue(":parent_id", parentId);
     query.bindValue(":teacher_id", teacherId);
 
@@ -229,7 +260,7 @@ QJsonArray DatabaseAccessor::getAllUsersByRole(User::UserRole role)
         while (query.next())
         {
             user[Protocol::USER_NAME] = query.value("user_name").toString();
-            user[Protocol::LOGIN] = query.value("user_login").toString();
+            user[Protocol::USER_LOGIN] = query.value("user_login").toString();
             user[Protocol::USER_ID] = query.value("user_id").toString();
 
             users.push_back(user);
@@ -242,12 +273,41 @@ QJsonArray DatabaseAccessor::getAllUsersByRole(User::UserRole role)
     return users;
 }
 
+QJsonArray DatabaseAccessor::getAllUsers()
+{
+    QSqlQuery query(db);
+
+    QJsonArray users;
+
+    query.prepare(QStringLiteral("SELECT user_id, user_name, user_login, user_role FROM users"));
+
+    if(query.exec())
+    {
+        QJsonObject user;
+
+        while (query.next())
+        {
+            user[Protocol::USER_NAME] = query.value("user_name").toString();
+            user[Protocol::USER_LOGIN] = query.value("user_login").toString();
+            user[Protocol::USER_ID] = query.value("user_id").toString();
+            user[Protocol::USER_ROLE] = query.value("user_role").toInt();
+
+            users.push_back(user);
+        }
+    }
+    else
+    {
+        MyDebug() << "get all users FAILED" << query.lastError().text();
+    }
+    return users;
+}
+
 QJsonArray DatabaseAccessor::getChildren(bool forParent, UserIdType id)
 {
     QSqlQuery query(db);
     QJsonArray children;
 
-    QString queryText = "SELECT id, name, age, parent_id, teacher_id FROM children";
+    QString queryText = "SELECT id, name, age, gender, parent_id, teacher_id FROM children";
     if(id != DefaultUserId)
     {
         if(forParent)
@@ -275,15 +335,16 @@ QJsonArray DatabaseAccessor::getChildren(bool forParent, UserIdType id)
             child[Protocol::CHILD_NAME] = query.value("name").toString();
             child[Protocol::CHILD_AGE] = query.value("age").toString();
             child[Protocol::CHILD_ID] = query.value("id").toString();
-            child[Protocol::CHILD_PARENT_ID] = qint64(query.value("parent_id").value<UserIdType>());
-            child[Protocol::CHILD_TEACHER_ID] = qint64(query.value("teacher_id").value<UserIdType>());
+            child[Protocol::CHILD_PARENT_ID] = query.value("parent_id").value<qint64>();
+            child[Protocol::CHILD_TEACHER_ID] = query.value("teacher_id").value<qint64>();
+            child[Protocol::CHILD_GENDER] = query.value("gender").toInt();
 
             children.push_back(child);
         }
     }
     else
     {
-        MyDebug() << "get all children FAILED";
+        MyDebug() << "get all children FAILED" << query.lastError().text();
     }
     return children;
 }

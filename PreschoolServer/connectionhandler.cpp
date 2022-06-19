@@ -52,6 +52,16 @@ ConnectionHandler::ConnectionHandler(QWebSocket* socket, QObject *parent) :
             Qt::QueuedConnection);
 }
 
+void ConnectionHandler::sendResultFailMessage(Protocol::Codes code)
+{
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, code},
+        {Protocol::RESULT, Protocol::RESULT_FAIL}
+    };
+
+    sendMessage(obj);
+}
+
 void ConnectionHandler::onMessageReceived(const QString &message)
 {
     MyDebug() << Q_FUNC_INFO;
@@ -82,12 +92,28 @@ void ConnectionHandler::onMessageReceived(const QString &message)
         {
             emit requestDatabase(obj, sharedFromThis());
         }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
         break;
     }
     case Protocol::Codes::LogOut:
     {
         m_userId = DefaultUserId;
         m_userName = "";
+        break;
+    }
+    case Protocol::Codes::GetAllUsers:
+    {
+        if(m_userId != DefaultUserId && m_userRole == UserRole::Admin)
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
         break;
     }
     default:

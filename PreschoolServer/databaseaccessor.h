@@ -27,6 +27,7 @@ private:
 
     bool createChild(const QString& name,
                      quint8 age,
+                     Gender gender,
                      UserIdType parentId,
                      UserIdType teacherId);
 
@@ -35,6 +36,8 @@ private:
     QJsonArray getAllTeachers();
 
     QJsonArray getAllUsersByRole(User::UserRole role);
+
+    QJsonArray getAllUsers();
 
     QJsonArray getChildren(bool forParent = false, UserIdType id = DefaultUserId);
 

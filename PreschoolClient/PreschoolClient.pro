@@ -5,6 +5,7 @@ CONFIG += c++17
 TARGET = PreschoolClient
 
 SOURCES += \
+    childrenmodel.cpp \
     connection.cpp \
     connectionwrapper.cpp \
     main.cpp \
@@ -17,6 +18,7 @@ RESOURCES += \
     qml.qrc
 
 HEADERS += \
+    childrenmodel.h \
     connection.h \
     ../PreschoolServer/Codes.h \
     connectionwrapper.h \

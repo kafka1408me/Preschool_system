@@ -7,7 +7,7 @@ static void registerTypes()
 {
     qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
 
-    qRegisterMetaType<User::UserRole>("User::UserRole");
+    qRegisterMetaType<User::UserRole>("UserRole");
 
     qmlRegisterUncreatableMetaObject(
                 User::staticMetaObject,       // static meta object

@@ -9,5 +9,9 @@
         <file>qml/InputFieldWithDescription.qml</file>
         <file>qml/MyButton.qml</file>
         <file>qml/MainServicePage.qml</file>
+        <file>qml/PeoplePage.qml</file>
+        <file>images/user.png</file>
+        <file>images/boy.png</file>
+        <file>images/girl.png</file>
     </qresource>
 </RCC>

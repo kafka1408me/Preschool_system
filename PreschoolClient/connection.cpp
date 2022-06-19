@@ -18,6 +18,8 @@ Connection::Connection(const QUrl& url, QObject *parent) :
     MyDebug() << "construct";
     connect(this, &Connection::userNameReceived, UserInfo::getInstance(), &UserInfo::setUserName);
     connect(this, &Connection::userRoleReceived, UserInfo::getInstance(), &UserInfo::setUserRole);
+    connect(this, &Connection::usersReceived, UserInfo::getInstance(), &UserInfo::setUsers);
+    connect(this, &Connection::childrenReceived, UserInfo::getInstance(), &UserInfo::setChildren);
 }
 
 Connection::~Connection()
@@ -102,7 +104,7 @@ void Connection::logIn(const QString &login, const QString &password)
 
     QJsonObject obj {
         {Protocol::MESSAGE_TYPE, Protocol::Codes::Authorization},
-        {Protocol::LOGIN, login},
+        {Protocol::USER_LOGIN, login},
         {Protocol::PASSWORD, password}
     };
 
@@ -115,6 +117,28 @@ void Connection::logOut()
 
     QJsonObject obj {
         {Protocol::MESSAGE_TYPE, Protocol::Codes::LogOut},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::getAllUsers()
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetAllUsers},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::getAllChildren()
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetAllChildren},
     };
 
     sendMessage(obj);
@@ -159,6 +183,24 @@ void Connection::onTextMessageReceived(const QString &message)
         else
         {
             emit logInFailed();
+        }
+        break;
+    }
+    case Protocol::Codes::GetAllUsers:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QJsonArray users = obj.value(Protocol::USERS).toArray();
+            emit usersReceived(users);
+        }
+        break;
+    }
+    case Protocol::Codes::GetAllChildren:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QJsonArray children = obj.value(Protocol::CHILDREN).toArray();
+            emit childrenReceived(children);
         }
         break;
     }

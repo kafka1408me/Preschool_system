@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import QtQuick.Controls 2.12
 import "qrc:/Functions.js" as Functions
 
 import preschool 1.0
@@ -18,9 +19,17 @@ Item {
         {name:"Создать тесты", action: function(){}}
     ]
     property var tabsAdmin: [{name:"Родители",
-            action:function(){}},
+            action:function(){
+                idRightAreaStackView.replace("PeoplePage.qml", {"usersRole":UserRole.Parent})
+            }},
         {name:"Воспитатели",
-                    action:function(){}},
+                    action:function(){
+                        idRightAreaStackView.replace("PeoplePage.qml", {"usersRole":UserRole.Teacher})
+                    }},
+        {name:"Администраторы",
+                    action:function(){
+                        idRightAreaStackView.replace("PeoplePage.qml", {"usersRole":UserRole.Admin})
+                    }},
         {name:"Дети",
                     action:function(){}}
     ]
@@ -164,10 +173,87 @@ Item {
                 }
                 case UserRole.Admin: {
                     model = tabsAdmin
+                    tabsAdmin[0].action()
                     break
                 }
                 }
             }
+        }
+    }
+
+    StackView {
+        id: idRightAreaStackView
+        anchors {
+            left: idLeftAreaRectangle.right
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+
+        property int animationDuration: 400
+
+        pushEnter: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                easing.type: Easing.Linear
+                from: 0
+                to: 1
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+
+        replaceEnter: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                easing.type: Easing.Linear
+                from: 0
+                to: 1
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+
+        replaceExit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                easing.type: Easing.Linear
+                from: 1
+                to: 0
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+
+        pushExit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                easing.type: Easing.Linear
+                from: 1
+                to: 0
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+        popEnter: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+        popExit: Transition {
+            PropertyAnimation {
+                property: "opacity"
+                from: 1
+                to: 0
+                duration: idRightAreaStackView.animationDuration
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        console.log("completed !", userInfo.userRole)
+        if(userInfo.userRole === UserRole.Admin)
+        {
+            connection.getAllUsers()
         }
     }
 }

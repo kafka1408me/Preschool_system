@@ -5,11 +5,13 @@
 #include <QSaveFile>
 #include <QDir>
 #include "userinfo.h"
+#include "childrenmodel.h"
 
-const QString UserName = QStringLiteral("userName");
-const QString UserRole = QStringLiteral("userRole");
+const QString userName = QStringLiteral("userName");
+const QString userRole = QStringLiteral("userRole");
 
-#define UserInfoDebug() qDebug() << "UserInfo:"
+#define MyDebug() qDebug() << "UserInfo:"
+#define MyWarning() qWarning() << "UserInfo:"
 
 QString getWritebleLocation()
 {
@@ -48,6 +50,10 @@ QJsonObject getDataFromFile()
 
 UserInfo::UserInfo()
 {
+    m_usersModel.reset(new UsersModel);
+    m_proxyUsersModel.reset(new UsersProxyModel(m_usersModel.data()));
+    m_childrenModel.reset(new ChildrenModel(m_usersModel.data()));
+
     getData();
 }
 
@@ -59,12 +65,26 @@ UserInfo *UserInfo::getInstance()
 
 void UserInfo::clearData()
 {
-    UserInfoDebug() << Q_FUNC_INFO;
+    MyDebug() << Q_FUNC_INFO;
 
     m_userName = "";
 
+    if(m_usersModel)
+    {
+        m_usersModel.reset();
+    }
+    if(m_proxyUsersModel)
+    {
+        m_proxyUsersModel.reset();
+    }
+
     QFile f(getDataFileName());
     f.remove();
+}
+
+void UserInfo::setUsersRoleForModel(UserRole usersRole)
+{
+    m_proxyUsersModel->setUsersRole(usersRole);
 }
 
 void UserInfo::setUserName(const QString &name)
@@ -76,7 +96,20 @@ void UserInfo::setUserName(const QString &name)
 void UserInfo::setUserRole(const User::UserRole role)
 {
     m_userRole = role;
+
     save();
+}
+
+void UserInfo::setUsers(const QJsonArray &users)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    m_usersModel->setUsers(users);
+}
+
+void UserInfo::setChildren(const QJsonArray &array)
+{
+    m_childrenModel->setChildren(array);
 }
 
 QString UserInfo::getUserName() const
@@ -89,47 +122,57 @@ User::UserRole UserInfo::getUserRole() const
     return m_userRole;
 }
 
+QAbstractItemModel *UserInfo::getUsersProxyModel() const
+{
+    return m_proxyUsersModel.data();
+}
+
+QAbstractItemModel *UserInfo::getChildrenModel() const
+{
+    return m_childrenModel.data();
+}
+
 void UserInfo::save()
 {
-    UserInfoDebug() << Q_FUNC_INFO;
+    MyDebug() << Q_FUNC_INFO;
 
     QSaveFile f(getDataFileName());
     if(!f.open(QIODevice::WriteOnly))
     {
-        UserInfoDebug() << "open file FAILED" << getDataFileName();
+        MyDebug() << "open file FAILED" << getDataFileName();
         return;
     }
 
     QJsonObject obj;
-    obj.insert(UserName, m_userName);
-    obj.insert(UserRole, int(m_userRole));
+    obj.insert(userName, m_userName);
+    obj.insert(userRole, int(m_userRole));
 
     QJsonDocument doc(obj);
     if(!f.write(doc.toJson()))
     {
-        UserInfoDebug() << "write file FAILED";
+        MyDebug() << "write file FAILED";
     }
 
     if(!f.commit())
     {
-        UserInfoDebug() << "commit FAILED";
+        MyDebug() << "commit FAILED";
         return;
     }
 
 
-    UserInfoDebug() << "data was saved SUCCESS";
+    MyDebug() << "data was saved SUCCESS";
 }
 
 void UserInfo::getData()
 {
     QJsonObject obj = getDataFromFile();
-    UserInfoDebug() << "data from file" << obj;
+    MyDebug() << "data from file" << obj;
     if(obj.isEmpty())
     {
-        UserInfoDebug() << "data obj is empty";
+        MyDebug() << "data obj is empty";
         return;
     }
 
-    m_userName = obj.value(UserName).toString();
-    m_userRole = User::UserRole(obj.value(UserRole).toInt());
+    m_userName = obj.value(userName).toString();
+    m_userRole = User::UserRole(obj.value(userRole).toInt());
 }

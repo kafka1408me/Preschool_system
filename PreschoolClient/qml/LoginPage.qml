@@ -3,7 +3,6 @@ import "qrc:/Functions.js" as Functions
 
 Item {
     id: idRoot
-    anchors.fill: parent
 
     signal showMessage(string text)
     signal logInSuccess()
@@ -40,12 +39,16 @@ Item {
                 id: idLoginInputField
                 inputFieldWith: idBottomArea.width * 0.3
                 descriptionText: "Логин"
+
+                text: "admin"
             }
             InputFieldWithDescription {
                 id: idPasswordInputField
                 inputFieldWith: idLoginInputField.inputFieldWith
                 descriptionText: "Пароль"
                 echoMode: TextInput.Password
+
+                text: "admin"
             }
         }
 
