@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <optional>
 #include "connectionhandler.h"
 
 class DatabaseAccessor: public QObject
@@ -30,6 +31,10 @@ private:
                      Gender gender,
                      UserIdType parentId,
                      UserIdType teacherId);
+
+    void addTrafficDays(UserIdType childId, int year, int month, const QList<int>& addingDays);
+
+    std::optional<QList<int>> getTrafficDays(UserIdType childId, int year, int month);
 
     QJsonArray getAllParents();
 

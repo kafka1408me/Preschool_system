@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QRandomGenerator>
 #include <QCryptographicHash>
+#include <QStringRef>
 #include "databaseaccessor.h"
 #include "application.h"
 #include "Codes.h"
@@ -83,6 +84,9 @@ void DatabaseAccessor::start()
     createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
     createChild("Алексей Хромов Иванович",  5, Gender::Male, 10, 11);
     createChild("Дарья Дурова Артемовна", 4, Gender::Female, 26, 11);
+
+    auto days1 = getTrafficDays(1, 2022, 6);
+    addTrafficDays(1, 2022, 6, {16, 17});
 }
 
 void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::ConnectionPtr connectionHandler)
@@ -268,6 +272,77 @@ bool DatabaseAccessor::createChild(const QString &name, quint8 age, Gender gende
 
     MyDebug() << "create child FAILED" << query.lastError().text();
     return false;
+}
+
+void DatabaseAccessor::addTrafficDays(UserIdType childId, int year, int month, const QList<int> &addingDays)
+{
+    auto existingDays = getTrafficDays(childId, year, month);
+    if(existingDays)
+    {
+        auto days = existingDays.value();
+        for(int addDay: addingDays)
+        {
+            if(!days.contains(addDay))
+            {
+                days.append(addDay);
+            }
+        }
+
+        QString daysStr("{");
+        for(int i = 0; i < days.size(); ++i)
+        {
+            daysStr += QString::number(days.at(i));
+            if(i != days.size() - 1)
+            {
+                daysStr += ",";
+            }
+        }
+        daysStr += "}";
+
+        QSqlQuery query(db);
+        query.prepare("UPDATE children_traffic SET days=:days WHERE child_id=:child_id AND year=:year AND month=:month");
+        query.bindValue(":days", daysStr);
+        query.bindValue(":child_id", childId);
+        query.bindValue(":year", year);
+        query.bindValue(":month", month);
+
+        if(query.exec())
+        {
+            MyDebug() << "add days SUCCESS";
+        }
+        else
+        {
+            MyDebug() << "add days FAILED" << query.lastError().text();
+        }
+    }
+    return;
+}
+
+std::optional<QList<int>> DatabaseAccessor::getTrafficDays(UserIdType childId, int year, int month)
+{
+    QSqlQuery query(db);
+    query.prepare(QStringLiteral("SELECT days FROM children_traffic WHERE child_id=:child_id AND year=:year AND month=:month"));
+    query.bindValue(":child_id", childId);
+    query.bindValue(":year", year);
+    query.bindValue(":month", month);
+
+    if(query.exec())
+    {
+        if(query.first())
+        {
+            QString myStr = query.value("days").toString();
+            QStringRef sref (&myStr, 1, myStr.length() - 2); // Remove braces
+            QVector<QStringRef> v = sref.split(",");
+            QList<int> days;
+            for (const QStringRef &r: v) {
+                days << r.toInt();
+            }
+            return days;
+        }
+        return {QList<int>{}};
+    }
+    MyDebug() << "get days FAILED" << query.lastError().text();
+    return {};
 }
 
 QJsonArray DatabaseAccessor::getAllParents()
