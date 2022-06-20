@@ -20,12 +20,20 @@ Item {
                 }
                 idRightAreaStackView.replace("MyChildPage.qml")
             }},
-        {name:"Тесты", action: function(){}},
-        {name:"Оплата", action: function(){}}
+        {name:"Тесты", action: function(){
+
+        }},
+        {name:"Оплата", action: function(){
+            idRightAreaStackView.replace("PaymentPage.qml")
+        }}
     ]
     property var tabsTeacher: [{name:"Дети",
-        action: function(){}},
-        {name:"Создать тесты", action: function(){}}
+        action: function(){
+            idRightAreaStackView.replace("PeoplePage.qml", {"isShowUsers":false, "isTeacher":true})
+        }},
+        {name:"Создать тесты", action: function(){
+            idRightAreaStackView.replace("CreateTestPage.qml")
+        }}
     ]
     property var tabsAdmin: [{name:"Родители",
             action:function(){

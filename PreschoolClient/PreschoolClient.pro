@@ -29,3 +29,6 @@ HEADERS += \
     usersproxymodel.h
 
 INCLUDEPATH += ../PreschoolServer
+
+DISTFILES += \
+    CreateTestPage.qml

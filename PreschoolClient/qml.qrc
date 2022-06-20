@@ -18,5 +18,8 @@
         <file>images/plus.png</file>
         <file>qml/MyButtonWithPlus.qml</file>
         <file>qml/MyChildPage.qml</file>
+        <file>qml/MyTabButton.qml</file>
+        <file>qml/PaymentPage.qml</file>
+        <file>qml/CreateTestPage.qml</file>
     </qresource>
 </RCC>

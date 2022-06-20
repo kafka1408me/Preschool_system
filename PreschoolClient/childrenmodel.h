@@ -24,6 +24,7 @@ public:
     ADD_MEMBER(quint8, m_age, getAge, setAge)
     ADD_MEMBER(Gender, m_gender, getGender, setGender)
     ADD_MEMBER(QString, m_name, getName, setName)
+    ADD_MEMBER(QList<int>, m_visitDays, getVisitDays, setVisitDays)
 };
 
 class ChildrenModel : public QAbstractListModel
@@ -38,7 +39,8 @@ public:
         ChildGender,
         ChildName,
         ChildParentName,
-        ChildTeacherName
+        ChildTeacherName,
+        ChildVisitDays
     };
 
     explicit ChildrenModel(UsersModel* usersModel, QObject *parent = nullptr);
@@ -50,6 +52,8 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     void setChildren(const QJsonArray& array);
+
+    void setChildVisitDays(UserIdType id, const QList<int>& visitDays);
 
     void clear();
 

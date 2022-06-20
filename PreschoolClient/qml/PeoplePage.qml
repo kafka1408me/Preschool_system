@@ -8,6 +8,8 @@ Item {
     property int usersRole: UserRole.Parent
     property bool isShowUsers: true
 
+    property bool isTeacher: false
+
     Text {
         id: idTitleText
         anchors.horizontalCenter: parent.horizontalCenter
@@ -158,6 +160,7 @@ Item {
                 color: "black"
             }
             Text {
+                visible: !isTeacher
                 x: idNameText.x
                 anchors.bottom: idLogoImage.bottom
                 font {
@@ -168,14 +171,15 @@ Item {
                 color: "black"
             }
             Text {
-                x: idNameText.x + 100
+                x:  isTeacher? idNameText.x : idNameText.x + 100
                 anchors.bottom: idLogoImage.bottom
                 font {
                     pointSize: Functions.mainFontPointSize - 1
                     weight: Font.Medium
                 }
                 width: idChangeButton.x - x - 5
-                text: qsTr("Родитель: <i>%1 (id: %2)</i>").arg(model.parentName).arg(model.parentId)
+                text: isTeacher ? qsTr("Родитель: <i>%1</i>").arg(model.parentName) :
+                          qsTr("Родитель: <i>%1 (id: %2)</i>").arg(model.parentName).arg(model.parentId)
                 color: "black"
                 elide: Text.ElideRight
             }
@@ -194,7 +198,7 @@ Item {
                 height: 50
                 btnColor: "#45c1f1"
                 btnPressedColor: Qt.darker(btnColor, 1.06)
-                btnText: "Редактировать"
+                btnText: isTeacher ? "Информация" : "Редактировать"
                 btnBorderWidth: 3
                 btnBorderColor: "#44a4ec"
                 btnRadius: 7
@@ -203,6 +207,7 @@ Item {
     }
 
     MyButtonWithPlus {
+        visible: !isTeacher
         y: idExitButton.y
         x: idExitButton.x - idLeftAreaRectangle.width - width - 30
         btnText: "Добавить"

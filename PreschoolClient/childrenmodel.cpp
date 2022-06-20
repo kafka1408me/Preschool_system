@@ -73,6 +73,18 @@ QVariant ChildrenModel::data(const QModelIndex &index, int role) const
         }
         return "";
     }
+    case ChildVisitDays:
+    {
+        QList<int> visitDays{1,2, 13, 14, 15};// = child.getVisitDays(); TEST
+        QVariantList days;
+        days.reserve(visitDays.size());
+
+        for(int day: visitDays)
+        {
+            days.append(day);
+        }
+        return days;
+    }
     default:
     {
     }
@@ -91,6 +103,7 @@ QHash<int, QByteArray> ChildrenModel::roleNames() const
     roles[ChildName] = "name";
     roles[ChildParentName] = "parentName";
     roles[ChildTeacherName] = "teacherName";
+    roles[ChildVisitDays] = "visitDays";
 
     return roles;
 }
@@ -121,6 +134,21 @@ void ChildrenModel::setChildren(const QJsonArray &array)
     qDebug() << "count children" << m_children.size();
 
     endResetModel();
+}
+
+void ChildrenModel::setChildVisitDays(UserIdType id, const QList<int> &visitDays)
+{
+    int row = -1;
+    auto it = std::find_if(m_children.begin(), m_children.end(), [id, &row](const Child& child){
+        ++row;
+        return child.getId() == id;
+    });
+
+    if(it != m_children.end())
+    {
+        it->setVisitDays(visitDays);
+        emit dataChanged(index(row, 0), index(row, 0));
+    }
 }
 
 void ChildrenModel::clear()
