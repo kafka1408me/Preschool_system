@@ -57,6 +57,10 @@ Window {
                 {
                     connection.getChildTeacher()
                 }
+                else if(userInfo.userRole === UserRole.Teacher)
+                {
+                    connection.getChildrenParents()
+                }
             }
 
             function onLogOut() {

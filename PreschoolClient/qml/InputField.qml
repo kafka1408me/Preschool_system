@@ -8,6 +8,7 @@ TextField {
     property color backgroundBorderColor: "#adbff3"
     property color backgroundBorderFocusColor: Functions.mainColor
     property alias backgroundColor: backgroundRectangle.color
+    property alias rectHeight: backgroundRectangle.implicitHeight
 
     font.pointSize: 14
 

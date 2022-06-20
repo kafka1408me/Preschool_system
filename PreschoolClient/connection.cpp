@@ -155,6 +155,37 @@ void Connection::getChildTeacher()
     sendMessage(obj);
 }
 
+void Connection::getChildrenParents()
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetChildrenParents},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::createTest(const QString &testName, const QStringList &questions)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonArray array;
+    for(const QString& questionStr: questions)
+    {
+        QJsonObject obj {{Protocol::QUESTION_TEXT, questionStr}};
+        array.push_back(obj);
+    }
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::CreateTest},
+        {Protocol::TEST_NAME, testName},
+        {Protocol::TEST_QUESTIONS, array}
+    };
+
+    sendMessage(obj);
+}
+
 void Connection::onTextMessageReceived(const QString &message)
 {
     MyDebug() << "message received" << message;
@@ -221,6 +252,27 @@ void Connection::onTextMessageReceived(const QString &message)
         {
             QJsonArray users = obj.value(Protocol::USERS).toArray();
             emit usersReceived(users);
+        }
+        break;
+    }
+    case Protocol::Codes::GetChildrenParents:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QJsonArray users = obj.value(Protocol::PARENTS).toArray();
+            emit usersReceived(users);
+        }
+        break;
+    }
+    case Protocol::Codes::CreateTest:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+           emit showMessage("Тест успешно загружен на сервер");
+        }
+        else
+        {
+            emit showMessage("Не удалось загрузить тест на сервер");
         }
         break;
     }

@@ -40,6 +40,8 @@ signals:
 
     void childrenReceived(const QJsonArray& users);
 
+    void showMessage(QString message);
+
 public slots:
     void start();
 
@@ -52,6 +54,10 @@ public slots:
     void getChildren();
 
     void getChildTeacher();
+
+    void getChildrenParents();
+
+    void createTest(const QString& testName, const QStringList& questions);
 
 private slots:
     void onTextMessageReceived(const QString& message);

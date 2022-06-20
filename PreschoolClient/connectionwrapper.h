@@ -29,6 +29,10 @@ public:
 
     Q_INVOKABLE void getChildTeacher();
 
+    Q_INVOKABLE void getChildrenParents();
+
+    Q_INVOKABLE void createTest(QString testName, QVariantList questions);
+
 signals:
     void startConnecting();
 
@@ -49,6 +53,10 @@ signals:
     void tryGetChildren();
 
     void tryGetChildTeacher();
+
+    void tryGetChildrenParents();
+
+    void tryCreateTest(const QString& testName, const QStringList& questions);
 
 private slots:
     void onConnectedChanged(bool connected);

@@ -21,6 +21,8 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::getChildren, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryGetChildTeacher,
             m_connection.get(), &Connection::getChildTeacher, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetChildrenParents,
+            m_connection.get(), &Connection::getChildrenParents, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -77,6 +79,22 @@ void ConnectionWrapper::getChildren()
 void ConnectionWrapper::getChildTeacher()
 {
     emit tryGetChildTeacher();
+}
+
+void ConnectionWrapper::getChildrenParents()
+{
+    emit tryGetChildrenParents();
+}
+
+void ConnectionWrapper::createTest(QString testName, QVariantList questions)
+{
+    QStringList questionsStrList;
+    questionsStrList.reserve(questions.size());
+    std::transform(questions.cbegin(), questions.cend(), std::back_inserter(questionsStrList), [](const QVariant& var) {
+        return var.toString();
+    });
+
+    emit tryCreateTest(testName, questionsStrList);
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

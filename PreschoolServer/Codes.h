@@ -40,7 +40,9 @@ enum Codes
     LogOut          = 2,
     GetChildren     = 3,
     GetAllUsers     = 4,
-    GetChildTeacher = 5
+    GetChildTeacher = 5,
+    GetChildrenParents = 6,
+    CreateTest         = 7
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -62,6 +64,13 @@ const QString CHILD_AGE = "age";
 const QString CHILD_PARENT_ID = "parent_id";
 const QString CHILD_TEACHER_ID = "teacher_id";
 const QString CHILD_GENDER = "gender";
+
+const QString CHILDREN_PARENTS_IDS = "children_parent";
+const QString PARENTS = "parents";
+
+const QString TEST_NAME = "test_name";
+const QString TEST_QUESTIONS = "test_questions";
+const QString QUESTION_TEXT = "question_text";
 
 constexpr int RESULT_SUCCESS = 0;
 constexpr int RESULT_FAIL = 1;

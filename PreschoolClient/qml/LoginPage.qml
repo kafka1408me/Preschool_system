@@ -35,10 +35,12 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 30
             spacing: 20
+            property real textWidth: Math.max(idLoginInputField.descriptionContentWidth, idPasswordInputField.descriptionContentWidth)
             InputFieldWithDescription {
                 id: idLoginInputField
                 inputFieldWith: idBottomArea.width * 0.3
                 descriptionText: "Логин"
+                textWidth: idInputFieldsArea.textWidth
 
                 text: "teacher_0"
             }
@@ -47,6 +49,7 @@ Item {
                 inputFieldWith: idLoginInputField.inputFieldWith
                 descriptionText: "Пароль"
                 echoMode: TextInput.Password
+                textWidth: idInputFieldsArea.textWidth
 
                 text: "teacher"
             }

@@ -60,6 +60,11 @@ bool ConnectionHandler::isUserParent() const
     return m_userId != DefaultUserId && m_userRole == UserRole::Parent;
 }
 
+bool ConnectionHandler::isUserTeacher() const
+{
+    return m_userId != DefaultUserId && m_userRole == UserRole::Teacher;
+}
+
 ConnectionHandler::ConnectionHandler(QWebSocket* socket, QObject *parent) :
     QObject(parent),
     m_socket(socket)
@@ -163,6 +168,18 @@ void ConnectionHandler::onMessageReceived(const QString &message)
         {
             sendResultFailMessage(Protocol::Codes(type));
         }
+    }
+    case Protocol::GetChildrenParents:
+    {
+        if(isUserTeacher())
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
+        break;
     }
     default:
     {

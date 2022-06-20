@@ -214,6 +214,15 @@ Item {
             bottom: parent.bottom
         }
 
+        Connections {
+            target: idRightAreaStackView.currentItem
+            ignoreUnknownSignals: true
+
+            function onShowMessage(text) {
+                idRoot.showMessage(text)
+            }
+        }
+
         property int animationDuration: 300
 
         pushEnter: Transition {
