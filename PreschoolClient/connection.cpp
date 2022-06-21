@@ -20,6 +20,7 @@ Connection::Connection(const QUrl& url, QObject *parent) :
     connect(this, &Connection::userRoleReceived, UserInfo::getInstance(), &UserInfo::setUserRole);
     connect(this, &Connection::usersReceived, UserInfo::getInstance(), &UserInfo::setUsers);
     connect(this, &Connection::childrenReceived, UserInfo::getInstance(), &UserInfo::setChildren);
+    connect(this, &Connection::testsReceived, UserInfo::getInstance(), &UserInfo::setTests);
 }
 
 Connection::~Connection()
@@ -186,6 +187,30 @@ void Connection::createTest(const QString &testName, const QStringList &question
     sendMessage(obj);
 }
 
+void Connection::getTests()
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::GetTests},
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::uploadTest(UserIdType id, QJsonArray answers)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::UploadTest},
+        {Protocol::TEST_ID, qint64(id)},
+        {Protocol::TEST_ANSWERS, answers}
+    };
+
+    sendMessage(obj);
+}
+
 void Connection::onTextMessageReceived(const QString &message)
 {
     MyDebug() << "message received" << message;
@@ -268,11 +293,38 @@ void Connection::onTextMessageReceived(const QString &message)
     {
         if(result == Protocol::RESULT_SUCCESS)
         {
-           emit showMessage("Тест успешно загружен на сервер");
+            emit showMessage("Тест успешно загружен на сервер");
         }
         else
         {
             emit showMessage("Не удалось загрузить тест на сервер");
+        }
+        break;
+    }
+    case Protocol::Codes::GetTests:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            QJsonArray tests = obj.value(Protocol::TESTS).toArray();
+            MyDebug() << "tests received" << tests;
+            emit testsReceived(tests);
+        }
+        else
+        {
+            emit showMessage("Ошибка загрузки тестов");
+        }
+        break;
+    }
+    case Protocol::Codes::UploadTest:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            emit showMessage("Ответы успешно загружены");
+            getTests();
+        }
+        else
+        {
+            emit showMessage("Ошибка отправки ответов!");
         }
         break;
     }

@@ -193,6 +193,30 @@ void ConnectionHandler::onMessageReceived(const QString &message)
         }
         break;
     }
+    case Protocol::GetTests:
+    {
+        if(isUserParent())
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
+        break;
+    }
+    case Protocol::UploadTest:
+    {
+        if(isUserParent())
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
+        break;
+    }
     default:
     {
         MyDebug() << "undefined message type" << type;

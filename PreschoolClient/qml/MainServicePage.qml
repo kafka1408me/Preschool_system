@@ -21,7 +21,7 @@ Item {
                 idRightAreaStackView.replace("MyChildPage.qml")
             }},
         {name:"Тесты", action: function(){
-
+            idRightAreaStackView.replace("TestsPage.qml")
         }},
         {name:"Оплата", action: function(){
             idRightAreaStackView.replace("PaymentPage.qml")
@@ -220,6 +220,18 @@ Item {
 
             function onShowMessage(text) {
                 idRoot.showMessage(text)
+            }
+
+            function onTestCreated() {
+                idRightAreaStackView.replace("CreateTestPage.qml")
+            }
+
+            function onPassTest(index) {
+                idRightAreaStackView.replace("PassingTest.qml", {"test":userInfo.getTest(index)})
+            }
+
+            function onTestFinished() {
+                idRightAreaStackView.replace("TestsPage.qml")
             }
         }
 

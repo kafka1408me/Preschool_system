@@ -56,6 +56,7 @@ Window {
                 if(userInfo.userRole === UserRole.Parent)
                 {
                     connection.getChildTeacher()
+                    connection.getTests()
                 }
                 else if(userInfo.userRole === UserRole.Teacher)
                 {

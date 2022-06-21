@@ -6,6 +6,8 @@ Item {
 
     signal showMessage(string text)
 
+    signal testCreated()
+
     Text {
         id: idTitleText
         anchors.horizontalCenter: parent.horizontalCenter
@@ -54,6 +56,7 @@ Item {
                 questions.push(idQuestionsModel.get(i).text)
             }
             connection.createTest(idNameTestInputField.text, questions)
+            idRoot.testCreated()
         }
     }
 

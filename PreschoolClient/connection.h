@@ -42,6 +42,8 @@ signals:
 
     void showMessage(QString message);
 
+    void testsReceived(QJsonArray tests);
+
 public slots:
     void start();
 
@@ -58,6 +60,10 @@ public slots:
     void getChildrenParents();
 
     void createTest(const QString& testName, const QStringList& questions);
+
+    void getTests();
+
+    void uploadTest(UserIdType id, QJsonArray answers);
 
 private slots:
     void onTextMessageReceived(const QString& message);

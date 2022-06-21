@@ -1,3 +1,4 @@
+#include <QJsonObject>
 #include <QThread>
 #include "connectionwrapper.h"
 #include "connection.h"
@@ -26,6 +27,10 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::getChildrenParents, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryCreateTest,
             m_connection.get(), &Connection::createTest, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryGetTests,
+            m_connection.get(), &Connection::getTests, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryUploadTest,
+            m_connection.get(), &Connection::uploadTest, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -102,6 +107,23 @@ void ConnectionWrapper::createTest(QString testName, QVariantList questions)
     });
 
     emit tryCreateTest(testName, questionsStrList);
+}
+
+void ConnectionWrapper::getTests()
+{
+    emit tryGetTests();
+}
+
+void ConnectionWrapper::uploadTest(UserIdType id, QVariantList answers)
+{
+    MyDebug() << Q_FUNC_INFO;
+    QJsonArray array;
+    for(const QVariant& var: answers)
+    {
+        array << var.toJsonObject();
+    }
+
+    emit tryUploadTest(id, array);
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

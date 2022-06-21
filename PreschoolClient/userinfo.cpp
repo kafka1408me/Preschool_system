@@ -53,6 +53,7 @@ UserInfo::UserInfo()
     m_proxyUsersModel.reset(new UsersProxyModel(m_usersModel.data()));
     m_childrenModel.reset(new ChildrenModel(m_usersModel.data()));
     m_childrenProxyModel.reset(new ProxyChildrenModel(m_childrenModel.data()));
+    m_testsModel.reset(new TestsModel);
 
     getData();
 }
@@ -71,6 +72,7 @@ void UserInfo::clearData()
 
     m_usersModel->clear();
     m_childrenModel->clear();
+    m_testsModel->clear();
 
     m_childrenProxyModel->setId(DefaultUserId);
 
@@ -86,6 +88,11 @@ void UserInfo::setUsersRoleForModel(UserRole usersRole)
 QVariantMap UserInfo::getChild(int index)
 {
     return m_childrenModel->getItemMap(index);
+}
+
+QVariantMap UserInfo::getTest(int index)
+{
+    return m_testsModel->getItemMap(index);
 }
 
 void UserInfo::setChildIdForShowing(UserIdType id)
@@ -119,6 +126,11 @@ void UserInfo::setChildren(const QJsonArray &array)
     m_childrenModel->setChildren(array);
 }
 
+void UserInfo::setTests(const QJsonArray &array)
+{
+    m_testsModel->setTests(array);
+}
+
 QString UserInfo::getUserName() const
 {
     return m_userName;
@@ -137,6 +149,11 @@ QAbstractItemModel *UserInfo::getUsersProxyModel() const
 QAbstractItemModel *UserInfo::getChildrenModel() const
 {
     return m_childrenProxyModel.data();
+}
+
+QAbstractItemModel *UserInfo::getTestsModel() const
+{
+    return m_testsModel.data();
 }
 
 void UserInfo::save()

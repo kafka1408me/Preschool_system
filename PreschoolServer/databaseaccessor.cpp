@@ -91,6 +91,8 @@ void DatabaseAccessor::start()
 
     auto days1 = getTrafficDays(1, 2022, 6);
     addTrafficDays(1, 2022, 6, {16, 17});
+
+//    qDebug() << getTestsForParent(10);
 }
 
 void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::ConnectionPtr connectionHandler)
@@ -263,7 +265,7 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
         query.prepare("INSERT INTO tests_for_parents (test_name, test_questions, test_creator_id) "
                       "VALUES(:test_name, :test_questions, :test_creator_id)");
         query.bindValue(":test_name", testName);
-        query.bindValue(":test_questions", QString(QJsonDocument(questions).toJson(QJsonDocument::Compact)));
+        query.bindValue(":test_questions", QString(QJsonDocument(QJsonObject{{Protocol::TEST_QUESTIONS, questions}}).toJson(QJsonDocument::Compact)));
         query.bindValue(":test_creator_id", connectionHandler->getUserId());
 
         QJsonObject responseObj;
@@ -280,6 +282,53 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
 
         connectionHandler->sendMessage(responseObj);
 
+        break;
+    }
+    case Protocol::Codes::GetTests:
+    {
+        QJsonObject tests = getTestsForParent(connectionHandler->getUserId());
+
+        tests.insert(Protocol::MESSAGE_TYPE, type);
+
+        if(tests.isEmpty())
+        {
+            tests.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
+        else
+        {
+            tests.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+
+        connectionHandler->sendMessage(tests);
+
+        break;
+    }
+    case Protocol::Codes::UploadTest:
+    {
+        QSqlQuery query(db);
+
+        QJsonArray answers = obj.value(Protocol::TEST_ANSWERS).toArray();
+        UserIdType testId = obj.value(Protocol::TEST_ID).toVariant().value<UserIdType>();
+
+        query.prepare("INSERT INTO finished_tests (test_id, answers, executor_id) "
+                      "VALUES(:test_id, :answers, :executor_id)");
+        query.bindValue(":test_id", testId);
+        query.bindValue(":answers", QString(QJsonDocument(QJsonObject{{Protocol::TEST_ANSWERS, answers}}).toJson(QJsonDocument::Compact)));
+        query.bindValue(":executor_id", connectionHandler->getUserId());
+
+        QJsonObject responseObj;
+        responseObj.insert(Protocol::MESSAGE_TYPE, type);
+        if(query.exec())
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+        else
+        {
+            MyDebug() << "insert finished FAILED" << query.lastError().text();
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
+
+        connectionHandler->sendMessage(responseObj);
         break;
     }
     default:
@@ -541,4 +590,33 @@ QJsonArray DatabaseAccessor::getChildrenForTeacher(UserIdType id)
 QJsonArray DatabaseAccessor::getChildrenForParent(UserIdType id)
 {
     return getChildren(UserRole::Parent, id);
+}
+
+QJsonObject DatabaseAccessor::getTestsForParent(UserIdType parentId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT test_id, test_name, test_questions FROM tests_for_parents WHERE test_creator_id IN "
+                  "(SELECT teacher_id FROM children WHERE parent_id=:parent_id) AND test_id NOT IN "
+                  "(SELECT test_id FROM finished_tests WHERE executor_id=:parent_id)");
+    query.bindValue(":parent_id", parentId);
+
+    QJsonObject testsObj;
+
+    if(query.exec())
+    {
+        QJsonArray array;
+        while (query.next())
+        {
+            QJsonObject testObj = QJsonDocument::fromJson(query.value(Protocol::TEST_QUESTIONS).toByteArray()).object();
+            testObj.insert(Protocol::TEST_NAME, query.value("test_name").toString());
+            testObj.insert(Protocol::TEST_ID, query.value("test_id").value<qint64>());
+            array.push_back(testObj);
+        }
+        testsObj.insert(Protocol::TESTS, array);
+    }
+    else
+    {
+        MyDebug() << "get tests FAILED" << query.lastError().text();
+    }
+    return testsObj;
 }

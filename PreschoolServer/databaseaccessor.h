@@ -52,6 +52,8 @@ private:
 
     QJsonArray getChildrenForParent(UserIdType id);
 
+    QJsonObject getTestsForParent(UserIdType parentId);
+
 private:
     QSqlDatabase db;
 };

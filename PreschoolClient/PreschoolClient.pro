@@ -11,6 +11,7 @@ SOURCES += \
     main.cpp \
     proxychildrenmodel.cpp \
     registertypes.cpp \
+    testsmodel.cpp \
     userinfo.cpp \
     usersmodel.cpp \
     usersproxymodel.cpp
@@ -24,6 +25,7 @@ HEADERS += \
     ../PreschoolServer/Codes.h \
     connectionwrapper.h \
     proxychildrenmodel.h \
+    testsmodel.h \
     userinfo.h \
     usersmodel.h \
     usersproxymodel.h

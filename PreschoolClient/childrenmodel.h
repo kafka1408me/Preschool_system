@@ -5,14 +5,6 @@
 
 class UsersModel;
 
-#define ADD_MEMBER(type, name, getter, setter) \
-    private: \
-        type name; \
-    public: \
-    type getter () const {return name;} \
-    void setter(const type& x){name = x;}
-
-
 class Child
 {
 public:

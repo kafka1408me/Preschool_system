@@ -5,6 +5,13 @@
 using UserIdType = quint64;
 #include <QObject>
 
+#define ADD_MEMBER(type, name, getter, setter) \
+    private: \
+        type name; \
+    public: \
+    type getter () const {return name;} \
+    void setter(const type& x){name = x;}
+
 
 const UserIdType DefaultUserId{0};
 
@@ -42,7 +49,9 @@ enum Codes
     GetAllUsers     = 4,
     GetChildTeacher = 5,
     GetChildrenParents = 6,
-    CreateTest         = 7
+    CreateTest         = 7,
+    GetTests           = 8,
+    UploadTest         = 9
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -70,7 +79,10 @@ const QString PARENTS = "parents";
 
 const QString TEST_NAME = "test_name";
 const QString TEST_QUESTIONS = "test_questions";
+const QString TEST_ANSWERS = "test_answers";
 const QString QUESTION_TEXT = "question_text";
+const QString TEST_ID = "test_id";
+const QString TESTS = "tests";
 
 constexpr int RESULT_SUCCESS = 0;
 constexpr int RESULT_FAIL = 1;

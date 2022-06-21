@@ -21,5 +21,8 @@
         <file>qml/MyTabButton.qml</file>
         <file>qml/PaymentPage.qml</file>
         <file>qml/CreateTestPage.qml</file>
+        <file>qml/TestsPage.qml</file>
+        <file>qml/TitleText.qml</file>
+        <file>qml/PassingTest.qml</file>
     </qresource>
 </RCC>

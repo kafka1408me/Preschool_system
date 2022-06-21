@@ -5,6 +5,7 @@
 #include "proxychildrenmodel.h"
 #include "usersmodel.h"
 #include "usersproxymodel.h"
+#include "testsmodel.h"
 #include "Codes.h"
 
 
@@ -19,6 +20,7 @@ class UserInfo: public QObject
 
     Q_PROPERTY(QAbstractItemModel* usersModel READ getUsersProxyModel CONSTANT)
     Q_PROPERTY(QAbstractItemModel* childrenModel READ getChildrenModel CONSTANT)
+    Q_PROPERTY(QAbstractItemModel* testsModel READ getTestsModel CONSTANT)
 
     Q_DISABLE_COPY(UserInfo)
 public:
@@ -30,6 +32,8 @@ public:
 
     Q_INVOKABLE QVariantMap getChild(int index);
 
+    Q_INVOKABLE QVariantMap getTest(int index);
+
     Q_INVOKABLE void setChildIdForShowing(UserIdType id);
 
     QString getUserName() const;
@@ -40,6 +44,8 @@ public:
 
     QAbstractItemModel *getChildrenModel() const;
 
+    QAbstractItemModel *getTestsModel() const;
+
 public slots:
     void setUserName(const QString& name);
 
@@ -48,6 +54,8 @@ public slots:
     void setUsers(const QJsonArray& users);
 
     void setChildren(const QJsonArray& array);
+
+    void setTests(const QJsonArray& array);
 
 private:
     UserInfo();
@@ -63,6 +71,6 @@ private:
     QScopedPointer<UsersProxyModel> m_proxyUsersModel;
     QScopedPointer<ChildrenModel> m_childrenModel;
     QScopedPointer<ProxyChildrenModel> m_childrenProxyModel;
-
+    QScopedPointer<TestsModel> m_testsModel;
 };
 

@@ -67,3 +67,16 @@ CREATE TABLE tests_for_parents(
     UNIQUE(test_name, test_creator_id),
     CONSTRAINT id_constraint FOREIGN KEY(test_creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+-------------------------------------------------
+
+DROP TABLE IF EXISTS finished_tests;
+
+CREATE TABLE finished_tests(
+	test_id BIGINT,
+    executor_id BIGINT,
+    answers JSON,
+    UNIQUE(test_id, executor_id),
+    CONSTRAINT test_id_constraint FOREIGN KEY(test_id) REFERENCES tests_for_parents(test_id) ON DELETE CASCADE,
+    CONSTRAINT executor_id_constraint FOREIGN KEY(executor_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

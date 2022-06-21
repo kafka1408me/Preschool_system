@@ -33,6 +33,10 @@ public:
 
     Q_INVOKABLE void createTest(QString testName, QVariantList questions);
 
+    Q_INVOKABLE void getTests();
+
+    Q_INVOKABLE void uploadTest(UserIdType id, QVariantList answers);
+
 signals:
     void startConnecting();
 
@@ -59,6 +63,10 @@ signals:
     void tryCreateTest(const QString& testName, const QStringList& questions);
 
     void showMessage(QString message);
+
+    void tryGetTests();
+
+    void tryUploadTest(UserIdType id, QJsonArray answers);
 
 private slots:
     void onConnectedChanged(bool connected);
