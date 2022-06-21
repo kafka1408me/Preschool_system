@@ -58,6 +58,8 @@ signals:
 
     void tryCreateTest(const QString& testName, const QStringList& questions);
 
+    void showMessage(QString message);
+
 private slots:
     void onConnectedChanged(bool connected);
 

@@ -181,6 +181,18 @@ void ConnectionHandler::onMessageReceived(const QString &message)
         }
         break;
     }
+    case Protocol::Codes::CreateTest:
+    {
+        if(isUserTeacher())
+        {
+            emit requestDatabase(obj, sharedFromThis());
+        }
+        else
+        {
+            sendResultFailMessage(Protocol::Codes(type));
+        }
+        break;
+    }
     default:
     {
         MyDebug() << "undefined message type" << type;

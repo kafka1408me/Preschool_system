@@ -71,6 +71,14 @@ Window {
         }
     }
 
+    Connections {
+        target: connection
+
+        function onShowMessage(text) {
+            idMessageRectangle.showMessage(text)
+        }
+    }
+
     Rectangle {
         id: idMessageRectangle
         anchors.horizontalCenter: parent.horizontalCenter

@@ -2,6 +2,7 @@
 #include "connectionwrapper.h"
 #include "connection.h"
 
+#define MyDebug() qDebug() << "ConnectionWrapper:"
 
 ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
     QObject(parent)
@@ -23,6 +24,8 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::getChildTeacher, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryGetChildrenParents,
             m_connection.get(), &Connection::getChildrenParents, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryCreateTest,
+            m_connection.get(), &Connection::createTest, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -30,6 +33,8 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             this, &ConnectionWrapper::logInSuccess);
     connect(m_connection.get(), &Connection::logInFailed,
             this, &ConnectionWrapper::logInFailed);
+    connect(m_connection.get(), &Connection::showMessage,
+            this, &ConnectionWrapper::showMessage);
 
     m_connection->moveToThread(m_connectionThread);
     m_connectionThread->start();
@@ -88,6 +93,8 @@ void ConnectionWrapper::getChildrenParents()
 
 void ConnectionWrapper::createTest(QString testName, QVariantList questions)
 {
+    MyDebug() << Q_FUNC_INFO;
+
     QStringList questionsStrList;
     questionsStrList.reserve(questions.size());
     std::transform(questions.cbegin(), questions.cend(), std::back_inserter(questionsStrList), [](const QVariant& var) {

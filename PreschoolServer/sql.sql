@@ -54,3 +54,16 @@ CREATE TABLE children_marks(
     UNIQUE(child_id, mark_time, mark_value, mark_description),
     CONSTRAINT id_constraint FOREIGN KEY(child_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+-------------------------------------------------
+
+DROP TABLE IF EXISTS tests_for_parents;
+
+CREATE TABLE tests_for_parents(
+	test_id BIGSERIAL NOT NULL PRIMARY KEY,
+    test_name TEXT,
+    test_questions json,
+    test_creator_id BIGINT,
+    UNIQUE(test_name, test_creator_id),
+    CONSTRAINT id_constraint FOREIGN KEY(test_creator_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

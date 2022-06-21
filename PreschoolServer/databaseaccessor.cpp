@@ -4,6 +4,7 @@
 #include <QRandomGenerator>
 #include <QCryptographicHash>
 #include <QStringRef>
+#include <QJsonDocument>
 #include "databaseaccessor.h"
 #include "application.h"
 #include "Codes.h"
@@ -245,6 +246,35 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
         else
         {
             MyDebug() << "get children parents FAILED" << query.lastError().text();
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
+
+        connectionHandler->sendMessage(responseObj);
+
+        break;
+    }
+    case Protocol::Codes::CreateTest:
+    {
+        QSqlQuery query(db);
+
+        QJsonArray questions = obj.value(Protocol::TEST_QUESTIONS).toArray();
+        QString testName = obj.value(Protocol::TEST_NAME).toString();
+
+        query.prepare("INSERT INTO tests_for_parents (test_name, test_questions, test_creator_id) "
+                      "VALUES(:test_name, :test_questions, :test_creator_id)");
+        query.bindValue(":test_name", testName);
+        query.bindValue(":test_questions", QString(QJsonDocument(questions).toJson(QJsonDocument::Compact)));
+        query.bindValue(":test_creator_id", connectionHandler->getUserId());
+
+        QJsonObject responseObj;
+        responseObj.insert(Protocol::MESSAGE_TYPE, type);
+        if(query.exec())
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+        else
+        {
+            MyDebug() << "insert new test FAILED" << query.lastError().text();
             responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
         }
 
