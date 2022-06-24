@@ -8,8 +8,11 @@ Application::Application(int argc, char **argv):
     QCoreApplication(argc, argv)
 {
     m_settings = new QSettings("config.ini", QSettings::IniFormat, this);
-
     application = this;
+}
+
+Application::~Application()
+{
 }
 
 Application* Application::getInstance()

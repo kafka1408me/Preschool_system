@@ -65,7 +65,7 @@ void Server::start()
     sslConfigServer.setPeerVerifyMode(QSslSocket::VerifyNone);
     sslConfigServer.setLocalCertificate(certificate);
     sslConfigServer.setPrivateKey(sslKey);
-    sslConfigServer.setProtocol(QSsl::TlsV1_1OrLater);
+    sslConfigServer.setProtocol(QSsl::TlsV1_2OrLater);
 
     m_webSocketServer = new QWebSocketServer(ServerName,
                                            QWebSocketServer::SslMode::SecureMode,

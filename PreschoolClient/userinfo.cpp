@@ -58,6 +58,11 @@ UserInfo::UserInfo()
     getData();
 }
 
+UserInfo::~UserInfo()
+{
+
+}
+
 UserInfo *UserInfo::getInstance()
 {
     static UserInfo userInfo;

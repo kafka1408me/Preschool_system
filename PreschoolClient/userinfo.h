@@ -60,6 +60,8 @@ public slots:
 private:
     UserInfo();
 
+    ~UserInfo();
+
     void save();
 
     void getData();

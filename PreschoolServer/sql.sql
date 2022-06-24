@@ -37,7 +37,7 @@ CREATE TABLE children_traffic(
     month INT,
     year INT,
     days INT[],
-    UNIQUE(child_id, year, month),
+    PRIMARY KEY(child_id, year, month),
     CONSTRAINT id_constraint FOREIGN KEY(child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
@@ -51,7 +51,7 @@ CREATE TABLE children_marks(
     mark_time  TIMESTAMP,
     mark_value INT,
     mark_description TEXT,
-    UNIQUE(child_id, mark_time, mark_value, mark_description),
+    PRIMARY KEY(child_id, mark_time, mark_value, mark_description),
     CONSTRAINT id_constraint FOREIGN KEY(child_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE tests_for_parents(
     test_name TEXT,
     test_questions json,
     test_creator_id BIGINT,
-    UNIQUE(test_name, test_creator_id),
+    PRIMARY KEY(test_name, test_creator_id),
     CONSTRAINT id_constraint FOREIGN KEY(test_creator_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
@@ -76,7 +76,7 @@ CREATE TABLE finished_tests(
 	test_id BIGINT,
     executor_id BIGINT,
     answers JSON,
-    UNIQUE(test_id, executor_id),
+    PRIMARY KEY(test_id, executor_id),
     CONSTRAINT test_id_constraint FOREIGN KEY(test_id) REFERENCES tests_for_parents(test_id) ON DELETE CASCADE,
     CONSTRAINT executor_id_constraint FOREIGN KEY(executor_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

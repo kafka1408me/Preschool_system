@@ -9,6 +9,8 @@ class Application: public QCoreApplication
 public:
     Application(int argc, char** argv);
 
+    ~Application();
+
     static Application* getInstance();
 
     int getServerPort() const;

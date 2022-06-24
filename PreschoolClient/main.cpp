@@ -13,8 +13,6 @@ int main(int argc, char *argv[])
     ConnectionWrapper connection{QUrl(QString("wss://192.168.1.64:%1").arg(DefaultPort))};
     connection.start();
 
-    UserInfo::getInstance()->setUserName("Мария Овсянкина Павловна");  // TEST
-
     QQmlApplicationEngine engine;
     auto context = engine.rootContext();
     context->setContextProperty("connection", &connection);
