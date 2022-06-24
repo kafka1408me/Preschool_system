@@ -42,7 +42,7 @@ Item {
                 descriptionText: "Логин"
                 textWidth: idInputFieldsArea.textWidth
 
-                text: "parent_0"
+             //   text: "parent_0"
             }
             InputFieldWithDescription {
                 id: idPasswordInputField
@@ -51,7 +51,7 @@ Item {
                 echoMode: TextInput.Password
                 textWidth: idInputFieldsArea.textWidth
 
-                text: "parent"
+            //    text: "parent"
             }
         }
 
