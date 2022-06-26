@@ -211,6 +211,37 @@ void Connection::uploadTest(UserIdType id, QJsonArray answers)
     sendMessage(obj);
 }
 
+void Connection::addUser(QString name, QString login, QString password, UserRole role)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::AddUser},
+        {Protocol::USER_NAME, name},
+        {Protocol::USER_LOGIN, login},
+        {Protocol::USER_PASSWORD, password},
+        {Protocol::USER_ROLE, role}
+    };
+
+    sendMessage(obj);
+}
+
+void Connection::addChild(QString name, quint8 age, Gender gender, UserIdType parentId, UserIdType teacherId)
+{
+    MyDebug() << Q_FUNC_INFO;
+
+    QJsonObject obj {
+        {Protocol::MESSAGE_TYPE, Protocol::Codes::AddChild},
+        {Protocol::CHILD_NAME, name},
+        {Protocol::CHILD_AGE, age},
+        {Protocol::CHILD_GENDER, gender},
+        {Protocol::CHILD_PARENT_ID, qint64(parentId)},
+        {Protocol::CHILD_TEACHER_ID, qint64(teacherId)}
+    };
+
+    sendMessage(obj);
+}
+
 void Connection::onTextMessageReceived(const QString &message)
 {
     MyDebug() << "message received" << message;
@@ -325,6 +356,32 @@ void Connection::onTextMessageReceived(const QString &message)
         else
         {
             emit showMessage("Ошибка отправки ответов!");
+        }
+        break;
+    }
+    case Protocol::Codes::AddUser:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            emit showMessage("Пользователь успешно добавлен");
+            getAllUsers();
+        }
+        else
+        {
+            emit showMessage("Ошибка добавления пользователя");
+        }
+        break;
+    }
+    case Protocol::Codes::AddChild:
+    {
+        if(result == Protocol::RESULT_SUCCESS)
+        {
+            emit showMessage("Ребенок успешно добавлен");
+            getChildren();
+        }
+        else
+        {
+            emit showMessage("Ошибка добавления ребенка");
         }
         break;
     }

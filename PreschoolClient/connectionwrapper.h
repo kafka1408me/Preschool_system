@@ -37,6 +37,10 @@ public:
 
     Q_INVOKABLE void uploadTest(UserIdType id, QVariantList answers);
 
+    Q_INVOKABLE void addUser(QString name, QString login, QString password, UserRole role);
+
+    Q_INVOKABLE void addChild(QString name, quint8 age, Gender gender, quint64 parentId, quint64 teacherId);
+
 signals:
     void startConnecting();
 
@@ -67,6 +71,10 @@ signals:
     void tryGetTests();
 
     void tryUploadTest(UserIdType id, QJsonArray answers);
+
+    void tryAddUser(QString name, QString login, QString password, UserRole role);
+
+    void tryAddChild(QString name, quint8 age, Gender gender, UserIdType parentId, UserIdType teacherId);
 
 private slots:
     void onConnectedChanged(bool connected);

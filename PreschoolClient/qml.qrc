@@ -24,5 +24,6 @@
         <file>qml/TestsPage.qml</file>
         <file>qml/TitleText.qml</file>
         <file>qml/PassingTest.qml</file>
+        <file>qml/CreateUserPage.qml</file>
     </qresource>
 </RCC>

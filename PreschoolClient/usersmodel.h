@@ -48,6 +48,8 @@ public:
 
     void clear();
 
+     QVariantMap getItemMap(int _index);
+
 private:
     QVector<PreschoolUser> m_users;
 };

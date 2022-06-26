@@ -36,6 +36,10 @@ public:
 
     Q_INVOKABLE void setChildIdForShowing(UserIdType id);
 
+    Q_INVOKABLE QVariantList getAllUsers();
+
+    Q_INVOKABLE QVariantList getAllChildren();
+
     QString getUserName() const;
 
     User::UserRole getUserRole() const;

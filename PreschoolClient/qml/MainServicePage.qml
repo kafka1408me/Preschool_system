@@ -233,6 +233,10 @@ Item {
             function onTestFinished() {
                 idRightAreaStackView.replace("TestsPage.qml")
             }
+
+            function onAddEntity() {
+                tabsAdmin[idTabsView.currentIndex].action()
+            }
         }
 
         property int animationDuration: 300

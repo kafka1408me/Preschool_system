@@ -75,14 +75,16 @@ QVariant ChildrenModel::data(const QModelIndex &index, int role) const
     }
     case ChildVisitDays:
     {
-        QList<int> visitDays{1,2, 13, 14, 15};// = child.getVisitDays(); TEST
+        // FAKE DATA
         QVariantList days;
+        QList<int> visitDays{1,2, 13, 14, 15};// = child.getVisitDays(); TEST
         days.reserve(visitDays.size());
 
         for(int day: visitDays)
         {
             days.append(day);
         }
+
         return days;
     }
     default:

@@ -79,15 +79,15 @@ void DatabaseAccessor::start()
         exit(-100);
     }
 
-    createUser("admin", "admin", "Татьяна Алексеевна", User::UserRole::Admin);
-    createUser("parent_0", "parent", "Алиса Хромова Петровна", User::UserRole::Parent);
-    createUser("parent_1", "parent", "Артем Дуров Иванович", User::UserRole::Parent);
-    createUser("parent_2", "parent", "Елена Рыжова Викторовна", User::UserRole::Parent);
-    createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
-    createUser("teacher_1", "teacher", "Ольга Полосова Евгеньевна", User::UserRole::Teacher);
-    createChild("Алексей Хромов Иванович",  5, Gender::Male, 10, 11);
-    createChild("Дарья Дурова Артемовна", 4, Gender::Female, 26, 11);
-    createChild("Василий Рыжов Игоревич", 6, Gender::Male, 160, 156);
+    createUser("admin", "admin", "Admin Admin", User::UserRole::Admin);
+//    createUser("parent_0", "parent", "Алиса Хромова Петровна", User::UserRole::Parent);
+//    createUser("parent_1", "parent", "Артем Дуров Иванович", User::UserRole::Parent);
+//    createUser("parent_2", "parent", "Елена Рыжова Викторовна", User::UserRole::Parent);
+//    createUser("teacher_0", "teacher", "Виктория Озерова Васильевна", User::UserRole::Teacher);
+//    createUser("teacher_1", "teacher", "Ольга Полосова Евгеньевна", User::UserRole::Teacher);
+//    createChild("Алексей Хромов Иванович",  5, Gender::Male, 10, 11);
+//    createChild("Дарья Дурова Артемовна", 4, Gender::Female, 26, 11);
+//    createChild("Василий Рыжов Игоревич", 6, Gender::Male, 160, 156);
 
     auto days1 = getTrafficDays(1, 2022, 6);
     addTrafficDays(1, 2022, 6, {16, 17});
@@ -329,6 +329,54 @@ void DatabaseAccessor::onRequest(const QJsonObject &obj, ConnectionHandler::Conn
         }
 
         connectionHandler->sendMessage(responseObj);
+        break;
+    }
+    case Protocol::AddUser:
+    {
+        QString userName = obj.value(USER_NAME).toString();
+        QString userLogin = obj.value(USER_LOGIN).toString();
+        QString userPassword = obj.value(USER_PASSWORD).toString();
+        UserRole userRole = UserRole(obj.value(USER_ROLE).toInt());
+
+        bool result = createUser(userLogin, userPassword, userName, userRole);
+
+        QJsonObject responseObj;
+        responseObj.insert(Protocol::MESSAGE_TYPE, type);
+        if(result)
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+        else
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
+
+        connectionHandler->sendMessage(responseObj);
+        break;
+    }
+    case Protocol::AddChild:
+    {
+        QString name = obj.value(CHILD_NAME).toString();
+        quint8 age = obj.value(CHILD_AGE).toInt();
+        Gender gender = Gender(obj.value(CHILD_GENDER).toInt());
+        UserIdType parentID = obj.value(CHILD_PARENT_ID).toVariant().value<qint64>();
+        UserIdType teacherID = obj.value(CHILD_TEACHER_ID).toVariant().value<qint64>();
+
+        bool result = createChild(name, age, gender, parentID, teacherID);
+
+        QJsonObject responseObj;
+        responseObj.insert(Protocol::MESSAGE_TYPE, type);
+        if(result)
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_SUCCESS);
+        }
+        else
+        {
+            responseObj.insert(Protocol::RESULT, Protocol::RESULT_FAIL);
+        }
+
+        connectionHandler->sendMessage(responseObj);
+
         break;
     }
     default:

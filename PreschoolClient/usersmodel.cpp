@@ -132,3 +132,21 @@ void UsersModel::clear()
     endResetModel();
 }
 
+QVariantMap UsersModel::getItemMap(int _index)
+{
+    QVariantMap varMap;
+    if(_index < 0 || _index >= m_users.size())
+    {
+        return varMap;
+    }
+
+    const auto roles = roleNames();
+
+    for(auto it = roles.cbegin(), end = roles.cend(); it != end; ++it)
+    {
+        varMap[it.value()] = data(index(_index, 0), it.key());
+    }
+
+    return varMap;
+}
+

@@ -105,6 +105,26 @@ void UserInfo::setChildIdForShowing(UserIdType id)
     m_childrenProxyModel->setId(id);
 }
 
+QVariantList UserInfo::getAllUsers()
+{
+    QVariantList users;
+    for(int i = 0; i < m_usersModel->rowCount(); ++i)
+    {
+        users.push_back(m_usersModel->getItemMap(i));
+    }
+    return users;
+}
+
+QVariantList UserInfo::getAllChildren()
+{
+    QVariantList children;
+    for(int i = 0; i < m_childrenModel->rowCount(); ++i)
+    {
+        children.push_back(m_childrenModel->getItemMap(i));
+    }
+    return children;
+}
+
 void UserInfo::setUserName(const QString &name)
 {
     m_userName = name;

@@ -31,6 +31,10 @@ ConnectionWrapper::ConnectionWrapper(const QUrl &url, QObject *parent):
             m_connection.get(), &Connection::getTests, Qt::QueuedConnection);
     connect(this, &ConnectionWrapper::tryUploadTest,
             m_connection.get(), &Connection::uploadTest, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryAddUser,
+            m_connection.get(), &Connection::addUser, Qt::QueuedConnection);
+    connect(this, &ConnectionWrapper::tryAddChild,
+            m_connection.get(), &Connection::addChild, Qt::QueuedConnection);
 
     connect(m_connection.get(), &Connection::isConnectedChanged,
             this, &ConnectionWrapper::onConnectedChanged, Qt::QueuedConnection);
@@ -124,6 +128,18 @@ void ConnectionWrapper::uploadTest(UserIdType id, QVariantList answers)
     }
 
     emit tryUploadTest(id, array);
+}
+
+void ConnectionWrapper::addUser(QString name, QString login, QString password, UserRole role)
+{
+    MyDebug() << Q_FUNC_INFO;
+    emit tryAddUser(name, login, password, role);
+}
+
+void ConnectionWrapper::addChild(QString name, quint8 age, Gender gender, quint64 parentId, quint64 teacherId)
+{
+    MyDebug() << Q_FUNC_INFO;
+    emit tryAddChild(name, age, gender, parentId, teacherId);
 }
 
 void ConnectionWrapper::onConnectedChanged(bool connected)

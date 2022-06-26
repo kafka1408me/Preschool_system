@@ -65,6 +65,10 @@ public slots:
 
     void uploadTest(UserIdType id, QJsonArray answers);
 
+    void addUser(QString name, QString login, QString password, UserRole role);
+
+    void addChild(QString name, quint8 age, Gender gender, UserIdType parentId, UserIdType teacherId);
+
 private slots:
     void onTextMessageReceived(const QString& message);
 

@@ -51,7 +51,9 @@ enum Codes
     GetChildrenParents = 6,
     CreateTest         = 7,
     GetTests           = 8,
-    UploadTest         = 9
+    UploadTest         = 9,
+    AddUser            = 10,
+    AddChild           = 11
 };
 
 const QString MESSAGE_TYPE = "type";
@@ -63,6 +65,7 @@ const QString RESULT = "result";
 const QString USER_NAME = "user_name";
 const QString USER_ROLE = "user_role";
 const QString USER_ID = "user_id";
+const QString USER_PASSWORD = "user_password";
 
 const QString USERS = "users";
 const QString CHILDREN = "children";

@@ -179,7 +179,7 @@ Item {
                 }
                 width: idChangeButton.x - x - 5
                 text: isTeacher ? qsTr("Родитель: <i>%1</i>").arg(model.parentName) :
-                          qsTr("Родитель: <i>%1 (id: %2)</i>").arg(model.parentName).arg(model.parentId)
+                                  qsTr("Родитель: <i>%1 (id: %2)</i>").arg(model.parentName).arg(model.parentId)
                 color: "black"
                 elide: Text.ElideRight
             }
@@ -214,6 +214,31 @@ Item {
         btnRadius: 5
         height: 50
         width: 200
+
+        onClicked: {
+            var entityType
+            if(isShowUsers)
+            {
+                if(usersRole === UserRole.Parent)
+                {
+                    entityType = "parent"
+                }
+                else if(usersRole === UserRole.Teacher)
+                {
+                    entityType = "teacher"
+                }
+                else if(usersRole === UserRole.Admin)
+                {
+                    entityType = "admin"
+                }
+            }
+            else
+            {
+                entityType = "boy"
+            }
+
+            idRightAreaStackView.replace("CreateUserPage.qml", {"typeEntity":entityType})
+        }
     }
 
 
